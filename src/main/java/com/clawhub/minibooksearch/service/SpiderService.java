@@ -1,4 +1,4 @@
-package com.clawhub.minibooksearch.spider.service;
+package com.clawhub.minibooksearch.service;
 
 /**
  * <Description> 爬虫对外接口<br>

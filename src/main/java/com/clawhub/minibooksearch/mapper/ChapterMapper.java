@@ -1,8 +1,7 @@
-package com.clawhub.minibooksearch.chapter.mapper;
+package com.clawhub.minibooksearch.mapper;
 
-
-import com.clawhub.minibooksearch.chapter.entity.Chapter;
 import com.clawhub.minibooksearch.common.IMapper;
+import com.clawhub.minibooksearch.entity.Chapter;
 
 public interface ChapterMapper extends IMapper<Chapter> {
 }

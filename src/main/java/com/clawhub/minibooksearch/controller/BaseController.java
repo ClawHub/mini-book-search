@@ -25,4 +25,13 @@ public class BaseController {
     public String welcome() {
         return ResultUtil.getSucc();
     }
+
+    /**
+     * getError
+     * @return getError
+     */
+    @RequestMapping(value = "/getError", method = RequestMethod.GET)
+    public String getError() {
+        return ResultUtil.getError("2000");
+    }
 }

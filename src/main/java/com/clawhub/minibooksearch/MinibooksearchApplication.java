@@ -9,7 +9,7 @@ import tk.mybatis.spring.annotation.MapperScan;
  * The type Minibooksearch application.
  */
 @SpringBootApplication
-@MapperScan("com.clawhub.minibooksearch.*.common")
+@MapperScan("com.clawhub.minibooksearch.mapper")
 public class MinibooksearchApplication {
 
     /**

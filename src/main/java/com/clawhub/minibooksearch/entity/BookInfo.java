@@ -1,11 +1,11 @@
-package com.clawhub.minibooksearch.book.entity;
+package com.clawhub.minibooksearch.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Table(name = "t_book")
-public class Book {
+@Table(name = "t_book_info")
+public class BookInfo {
     /**
      * 书籍id
      */
@@ -16,11 +16,6 @@ public class Book {
      * 书名
      */
     private String name;
-
-    /**
-     * 小说链接
-     */
-    private String url;
 
     /**
      * 作者
@@ -51,12 +46,6 @@ public class Book {
      * 字数
      */
     private Integer number;
-
-    /**
-     * 更新时间
-     */
-    @Column(name = "updateTime")
-    private Long updatetime;
 
     /**
      * 简介
@@ -103,24 +92,6 @@ public class Book {
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * 获取小说链接
-     *
-     * @return url - 小说链接
-     */
-    public String getUrl() {
-        return url;
-    }
-
-    /**
-     * 设置小说链接
-     *
-     * @param url 小说链接
-     */
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     /**
@@ -229,24 +200,6 @@ public class Book {
      */
     public void setNumber(Integer number) {
         this.number = number;
-    }
-
-    /**
-     * 获取更新时间
-     *
-     * @return updateTime - 更新时间
-     */
-    public Long getUpdatetime() {
-        return updatetime;
-    }
-
-    /**
-     * 设置更新时间
-     *
-     * @param updatetime 更新时间
-     */
-    public void setUpdatetime(Long updatetime) {
-        this.updatetime = updatetime;
     }
 
     /**

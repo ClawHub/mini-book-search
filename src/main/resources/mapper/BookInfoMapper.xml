@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clawhub.minibooksearch.mapper.BookInfoMapper">
+  <resultMap id="BaseResultMap" type="com.clawhub.minibooksearch.entity.BookInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="auther" jdbcType="VARCHAR" property="auther" />
+    <result column="site" jdbcType="VARCHAR" property="site" />
+    <result column="classify" jdbcType="VARCHAR" property="classify" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+    <result column="attribute" jdbcType="VARCHAR" property="attribute" />
+    <result column="number" jdbcType="INTEGER" property="number" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="pic_url" jdbcType="VARCHAR" property="picUrl" />
+  </resultMap>
+  <!--根据关键词搜索书名-->
+  <select id="searchBookInfo" resultMap="BaseResultMap">
+    SELECT *
+    FROM t_book_info
+    WHERE LOCATE(#{name,jdbcType=VARCHAR}, name)>0
+  </select>
+</mapper>

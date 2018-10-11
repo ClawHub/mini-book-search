@@ -1,4 +1,4 @@
-package com.clawhub.minibooksearch.chapter.entity;
+package com.clawhub.minibooksearch.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -13,10 +13,10 @@ public class Chapter {
     private String id;
 
     /**
-     * 书名id
+     * 书籍源id
      */
-    @Column(name = "book_id")
-    private String bookId;
+    @Column(name = "source_id")
+    private String sourceId;
 
     /**
      * 章节名称
@@ -63,21 +63,21 @@ public class Chapter {
     }
 
     /**
-     * 获取书名id
+     * 获取书籍源id
      *
-     * @return book_id - 书名id
+     * @return source_id - 书籍源id
      */
-    public String getBookId() {
-        return bookId;
+    public String getSourceId() {
+        return sourceId;
     }
 
     /**
-     * 设置书名id
+     * 设置书籍源id
      *
-     * @param bookId 书名id
+     * @param sourceId 书籍源id
      */
-    public void setBookId(String bookId) {
-        this.bookId = bookId;
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
     }
 
     /**

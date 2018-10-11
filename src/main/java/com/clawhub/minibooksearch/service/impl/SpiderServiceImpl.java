@@ -1,6 +1,6 @@
-package com.clawhub.minibooksearch.spider.service.impl;
+package com.clawhub.minibooksearch.service.impl;
 
-import com.clawhub.minibooksearch.spider.service.SpiderService;
+import com.clawhub.minibooksearch.service.SpiderService;
 import org.springframework.stereotype.Service;
 
 /**
