@@ -2,6 +2,7 @@ package com.clawhub.minibooksearch.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.clawhub.minibooksearch.service.BookService;
+import com.clawhub.minibooksearch.service.SpiderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,12 @@ public class BookController {
      */
     @Autowired
     private BookService bookService;
+
+    /**
+     * The Spider service.
+     */
+    @Autowired
+    private SpiderService spiderService;
 
     /**
      * 推荐书籍
@@ -51,6 +58,9 @@ public class BookController {
         int pageNum = body.getIntValue("pageNum");
         int pageSize = body.getIntValue("pageSize");
         String keyWord = body.getString("name");
+        //异步书籍搜集
+        spiderService.searchKeywordsCollection(keyWord);
+        //本地书籍信息查询
         return bookService.searchBookInfo(pageNum, pageSize, keyWord);
     }
 

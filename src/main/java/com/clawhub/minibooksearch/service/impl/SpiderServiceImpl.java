@@ -1,6 +1,8 @@
 package com.clawhub.minibooksearch.service.impl;
 
 import com.clawhub.minibooksearch.service.SpiderService;
+import com.clawhub.minibooksearch.spider.queue.MessageSender;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,8 +15,14 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SpiderServiceImpl implements SpiderService {
-    @Override
-    public void searchKeywordsCollection(String keywords) {
+    /**
+     * The Message sender.
+     */
+    @Autowired
+    private MessageSender messageSender;
 
+    @Override
+    public void searchKeywordsCollection(String keyword) {
+        messageSender.sendMessage(keyword);
     }
 }

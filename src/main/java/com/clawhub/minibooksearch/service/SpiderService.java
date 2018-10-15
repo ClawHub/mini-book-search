@@ -13,7 +13,7 @@ public interface SpiderService {
     /**
      * 搜集搜索关键词
      *
-     * @param keywords 搜索关键词
+     * @param keyword 搜索关键词
      */
-    void searchKeywordsCollection(String keywords);
+    void searchKeywordsCollection(String keyword);
 }
