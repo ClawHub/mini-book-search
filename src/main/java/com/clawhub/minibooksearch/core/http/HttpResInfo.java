@@ -1,5 +1,9 @@
 package com.clawhub.minibooksearch.core.http;
 
+import org.apache.http.cookie.Cookie;
+
+import java.util.List;
+
 /**
  * <Description> 响应封装<br>
  *
@@ -12,6 +16,19 @@ public class HttpResInfo {
 
     private boolean success;
     private String result;
+    private List<Cookie> cookies;
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public List<Cookie> getCookies() {
+        return cookies;
+    }
+
+    public void setCookies(List<Cookie> cookies) {
+        this.cookies = cookies;
+    }
 
     public void setSuccess(boolean success) {
         this.success = success;

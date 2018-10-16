@@ -10,7 +10,7 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="url" jdbcType="VARCHAR" property="url" />
     <result column="date_time" jdbcType="BIGINT" property="dateTime" />
-    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="sort" jdbcType="BIGINT" property="sort" />
     <result column="number" jdbcType="INTEGER" property="number" />
   </resultMap>
 </mapper>

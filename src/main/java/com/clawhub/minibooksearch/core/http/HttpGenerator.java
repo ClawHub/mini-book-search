@@ -1,9 +1,9 @@
 package com.clawhub.minibooksearch.core.http;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -17,11 +17,13 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
@@ -97,10 +99,12 @@ public class HttpGenerator {
         Registry<ConnectionSocketFactory> socketFactoryRegistry = geneRegistry();
         // 设置连接管理器
         HttpClientConnectionManager connManager = new BasicHttpClientConnectionManager(socketFactoryRegistry);
+
         // 创建自定义的httpclient对象
         return HttpClients.custom().setConnectionManager(connManager).build();
 
     }
+
 
     /**
      * 忽略证书策略
@@ -167,14 +171,13 @@ public class HttpGenerator {
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             // 正常连接到目标并获取到返回
             String body = getBody(response);
-            LOGGER.info(" url is : {}, source result from upStream is : {}", shortUrl(url), body);
+//            LOGGER.info(" url is : {}, source result from upStream is : {}", url, body);
             int status = response.getStatusLine().getStatusCode();
             // 返回非200，打印日志
             if (HttpStatus.SC_OK != status) {
                 LOGGER.error("http status is not 200, the status is :{}", status);
             }
             httpResInfo = getRsp(status, null, body);
-
         } catch (IOException e) {
             // 获取数据发生异常
             httpResInfo = getRsp(HttpConfig.EXC_STATUS, e, "");
@@ -229,19 +232,70 @@ public class HttpGenerator {
     }
 
     /**
-     * 去除srcUrl中的敏感信息
+     * 生成httpclient
      *
-     * @param srcUrl the src url
-     * @return the string
+     * @return the closeable http client
      */
-    protected static String shortUrl(String srcUrl) {
-        if (StringUtils.isEmpty(srcUrl) || !srcUrl.contains("?")) {
-            return srcUrl;
-        } else {
-            return srcUrl.substring(0, srcUrl.indexOf('?'));
-        }
+    protected static CloseableHttpClient generateHttpClientWithCookie() {
+        // 忽略证书策略
+        Registry<ConnectionSocketFactory> socketFactoryRegistry = geneRegistry();
+        // 设置连接管理器
+        HttpClientConnectionManager connManager = new BasicHttpClientConnectionManager(socketFactoryRegistry);
+        CookieStore cookieStore = new BasicCookieStore();
+        // 创建自定义的httpclient对象
+        return HttpClients.custom().setDefaultCookieStore(cookieStore).setConnectionManager(connManager).build();
+
     }
 
+    /**
+     * Send getwith cookie http res info.
+     *
+     * @param url         the url
+     * @param contimeout  the contimeout
+     * @param readtimeout the readtimeout
+     * @param headMap     the head map
+     * @return the http res info
+     */
+    public static HttpResInfo sendGetwithCookie(String url, int contimeout, int readtimeout, Map<String, String> headMap) {
+        // 创建get方式请求对象
+        HttpGet httpGet = new HttpGet(url);
+        // 设置超时时间
+        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(readtimeout).setConnectTimeout(contimeout).build();
+        httpGet.setConfig(requestConfig);
+        // 增加特殊的请求头
+        if (null != headMap && !headMap.isEmpty()) {
+            for (Map.Entry<String, String> entry : headMap.entrySet()) {
+                httpGet.setHeader(entry.getKey(), entry.getValue());
+            }
+        }
+        // 忽略证书策略
+        Registry<ConnectionSocketFactory> socketFactoryRegistry = geneRegistry();
+        // 设置连接管理器
+        HttpClientConnectionManager connManager = new BasicHttpClientConnectionManager(socketFactoryRegistry);
+        CookieStore cookieStore = new BasicCookieStore();
+        //获取httpclient
+        CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).setConnectionManager(connManager).build();
+        HttpResInfo httpResInfo;
+        try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+            // 正常连接到目标并获取到返回
+            String body = getBody(response);
+            LOGGER.info(" url is : {}, source result from upStream is : {}", url, body);
+            int status = response.getStatusLine().getStatusCode();
+            // 返回非200，打印日志
+            if (HttpStatus.SC_OK != status) {
+                LOGGER.error("http status is not 200, the status is :{}", status);
+            }
+            httpResInfo = getRsp(status, null, body);
+            //设置cookie
+            List<Cookie> cookies = cookieStore.getCookies();
+            httpResInfo.setCookies(cookies);
+        } catch (IOException e) {
+            // 获取数据发生异常
+            httpResInfo = getRsp(HttpConfig.EXC_STATUS, e, "");
+            LOGGER.error("sendRequest exception", e);
+        }
+        return httpResInfo;
+    }
 
     /**
      * Send get http res info.

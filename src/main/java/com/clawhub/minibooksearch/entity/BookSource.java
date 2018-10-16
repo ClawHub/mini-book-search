@@ -28,7 +28,7 @@ public class BookSource {
      * 更新时间
      */
     @Column(name = "update_Time")
-    private Long updateTime;
+    private String updateTime;
 
     /**
      * 目录链接
@@ -101,7 +101,7 @@ public class BookSource {
      *
      * @return updateTime - 更新时间
      */
-    public Long getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
@@ -110,7 +110,7 @@ public class BookSource {
      *
      * @param updateTime 更新时间
      */
-    public void setUpdateTime(Long updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 

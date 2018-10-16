@@ -14,5 +14,5 @@ public interface Egg {
      *
      * @param keyword 关键词
      */
-    void touch(String keyword);
+    EggResult touch(String keyword);
 }

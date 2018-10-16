@@ -2,6 +2,7 @@ package com.clawhub.minibooksearch.spider.queue;
 
 import com.clawhub.minibooksearch.core.spring.SpringContextHelper;
 import com.clawhub.minibooksearch.spider.core.Egg;
+import com.clawhub.minibooksearch.spider.core.EggResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

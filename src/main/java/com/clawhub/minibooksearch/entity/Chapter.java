@@ -37,7 +37,7 @@ public class Chapter {
     /**
      * 序列
      */
-    private Integer sort;
+    private Long sort;
 
     /**
      * 章节字数
@@ -139,7 +139,7 @@ public class Chapter {
      *
      * @return sort - 序列
      */
-    public Integer getSort() {
+    public Long getSort() {
         return sort;
     }
 
@@ -148,7 +148,7 @@ public class Chapter {
      *
      * @param sort 序列
      */
-    public void setSort(Integer sort) {
+    public void setSort(Long sort) {
         this.sort = sort;
     }
 
