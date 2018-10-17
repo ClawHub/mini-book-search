@@ -14,6 +14,7 @@ import com.clawhub.minibooksearch.mapper.BookSourceMapper;
 import com.clawhub.minibooksearch.mapper.ChapterMapper;
 import com.clawhub.minibooksearch.spider.core.Egg;
 import com.clawhub.minibooksearch.spider.core.EggResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.cookie.Cookie;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,6 +23,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +63,12 @@ public class Qidian implements Egg {
      */
     @Autowired
     private ChapterMapper chapterMapper;
+
+    /**
+     * The String redis template.
+     */
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 爬虫入口
@@ -123,27 +131,47 @@ public class Qidian implements Egg {
      */
     private void parseSingleBook(Element element) {
         logger.info("解析单条数据");
-        //获取图片url
-        String picUrl = element.select(".book-img-box img").first().attr("src");
         //获取书名
         String name = element.select(".book-mid-info a").first().text();
         //获取作者
         String auther = element.select(".book-mid-info .author").select(".name, i").text();
-        //分类
-        String classify = element.select(".book-mid-info .author a:not(.name)").text();
-        //状态
-        String state = element.select(".book-mid-info .author span").text();
-        //简介
-        String remark = element.select(".book-mid-info .intro").text();
-        //总字数
-        String numberStr = element.select(".book-right-info .total span").first().text();
-        int number;
-        int indexOf = numberStr.indexOf("万");
-        if (indexOf > -1) {
-            numberStr = numberStr.substring(0, indexOf);
-            number = (int) (Double.parseDouble(numberStr) * 10000);
-        } else {
-            number = Integer.parseInt(numberStr);
+        //redis去重key
+        String checkKey = name.trim() + "-" + auther.trim();
+        //bookId
+        String bookId = stringRedisTemplate.opsForValue().get(checkKey);
+        if (StringUtils.isBlank(bookId)) {
+            //获取图片url
+            String picUrl = element.select(".book-img-box img").first().attr("src");
+            //分类
+            String classify = element.select(".book-mid-info .author a:not(.name)").text();
+            //状态
+            String state = element.select(".book-mid-info .author span").text();
+            //简介
+            String remark = element.select(".book-mid-info .intro").text();
+            //总字数
+            String numberStr = element.select(".book-right-info .total span").first().text();
+            int number;
+            int indexOf = numberStr.indexOf("万");
+            if (indexOf > -1) {
+                numberStr = numberStr.substring(0, indexOf);
+                number = (int) (Double.parseDouble(numberStr) * 10000);
+            } else {
+                number = Integer.parseInt(numberStr);
+            }
+            bookId = IDGenarator.getID();
+            //书籍基本信息入库
+            logger.info("书籍基本信息入库");
+            BookInfo bookinfo = new BookInfo();
+            bookinfo.setAuther(auther);
+            bookinfo.setClassify(classify);
+            bookinfo.setId(bookId);
+            bookinfo.setName(name);
+            bookinfo.setNumber(number);
+            bookinfo.setPicUrl(picUrl);
+            bookinfo.setRemark(remark);
+            bookinfo.setState(state);
+            bookInfoMapper.insert(bookinfo);
+            stringRedisTemplate.opsForValue().set(checkKey, bookId);
         }
         //更新时间
         String updateTime = element.select(".book-mid-info .update span").first().text();
@@ -154,19 +182,6 @@ public class Qidian implements Egg {
         //目录链接
         String catalogUrl = url + "#Catalog";
 
-        //书籍基本信息入库
-        logger.info("书籍基本信息入库");
-        String bookId = IDGenarator.getID();
-        BookInfo bookinfo = new BookInfo();
-        bookinfo.setAuther(auther);
-        bookinfo.setClassify(classify);
-        bookinfo.setId(bookId);
-        bookinfo.setName(name);
-        bookinfo.setNumber(number);
-        bookinfo.setPicUrl(picUrl);
-        bookinfo.setRemark(remark);
-        bookinfo.setState(state);
-        bookInfoMapper.insert(bookinfo);
 
         //书籍源信息入库
         logger.info("书籍源信息入库");
