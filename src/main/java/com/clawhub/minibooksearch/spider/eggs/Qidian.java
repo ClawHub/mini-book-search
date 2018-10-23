@@ -41,7 +41,7 @@ import java.util.List;
  * @taskId <br>
  * @create 2018-10-15 21:28<br>
  */
-@Component
+@Component("www.qidian.com")
 public class Qidian implements Egg {
     /**
      * The Logger.
@@ -211,7 +211,7 @@ public class Qidian implements Egg {
         bookSource.setSourceId(dataBid);
         bookSource.setUpdateTime(updateTime);
         bookSource.setUrl(url);
-        bookSource.setWebSite("起点中文网");
+        bookSource.setWebSite("www.qidian.com");
         bookSourceMapper.insert(bookSource);
 
 
