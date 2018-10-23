@@ -16,4 +16,14 @@ public interface SpiderService {
      * @param keyword 搜索关键词
      */
     void searchKeywordsCollection(String keyword);
+
+    /**
+     * 实时获取章节信息
+     *
+     * @param webSite    站点
+     * @param catalogUrl 目录地址
+     * @param sourceId   书籍源ID
+     * @return 章节信息
+     */
+    String searchChapter(String webSite, String catalogUrl, String sourceId);
 }
