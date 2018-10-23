@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -204,11 +205,10 @@ public class Qidian implements Egg {
 
         //书籍源信息入库
         logger.info("书籍源信息入库 website:起点中文网");
-        String sourceId = "www.qidian.com";
         BookSource bookSource = new BookSource();
         bookSource.setBookId(bookId);
         bookSource.setCatalogUrl(catalogUrl);
-        bookSource.setSourceId(sourceId);
+        bookSource.setSourceId(dataBid);
         bookSource.setUpdateTime(updateTime);
         bookSource.setUrl(url);
         bookSource.setWebSite("起点中文网");
@@ -216,25 +216,20 @@ public class Qidian implements Egg {
 
 
         //获取章节
-        category(catalogUrl, dataBid, sourceId);
+//        category(catalogUrl, dataBid);
 
 
     }
 
-    /**
-     * 获取章节
-     *
-     * @param catalogUrl 目录url
-     * @param dataBid    the data bid
-     * @param sourceId   the source id
-     */
-    private void category(String catalogUrl, String dataBid, String sourceId) {
+    @Override
+    public List<Chapter> chapter(String catalogUrl, String sourceId) {
+        List<Chapter> chapters = new ArrayList<>();
         //获取token
         String token = getToken(catalogUrl);
 
         logger.info("获取章节");
         //获取章节
-        HttpResInfo catalogRes = HttpGenerator.sendGet("https://book.qidian.com/ajax/book/category?_csrfToken=" + token + "&bookId=" + dataBid, 6000, 6000, null, false);
+        HttpResInfo catalogRes = HttpGenerator.sendGet("https://book.qidian.com/ajax/book/category?_csrfToken=" + token + "&bookId=" + sourceId, 6000, 6000, null, false);
         if (catalogRes.isSuccess()) {
             JSONObject body = JSONObject.parseObject(catalogRes.getResult());
             JSONObject data = body.getJSONObject("data");
@@ -268,7 +263,7 @@ public class Qidian implements Egg {
                             String number = cnt;
 
                             //章节数据入库
-                            logger.info("章节数据入库 name:{}", name);
+                            logger.info("章节名称:{}", name);
                             Chapter chapter = new Chapter();
                             chapter.setDateTime(dateTime);
                             chapter.setId(IDGenarator.getID());
@@ -277,13 +272,15 @@ public class Qidian implements Egg {
                             chapter.setSort(sort);
                             chapter.setSourceId(sourceId);
                             chapter.setUrl(url);
-                            chapterMapper.insert(chapter);
+                            chapters.add(chapter);
+//                            chapterMapper.insert(chapter);
                         }
 
                     }
                 }
             }
         }
+        return chapters;
     }
 
     /**
