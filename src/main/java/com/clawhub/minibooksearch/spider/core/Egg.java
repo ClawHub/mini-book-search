@@ -1,5 +1,9 @@
 package com.clawhub.minibooksearch.spider.core;
 
+import com.clawhub.minibooksearch.entity.Chapter;
+
+import java.util.List;
+
 /**
  * <Description>爬虫统一接口<br>
  *
@@ -15,4 +19,13 @@ public interface Egg {
      * @param keyword 关键词
      */
     EggResult touch(String keyword);
+
+    /**
+     * 获取章节
+     *
+     * @param catalogUrl 目录url
+     * @param sourceId   sourceId
+     * @return 章节列表
+     */
+    List<Chapter> chapter(String catalogUrl, String sourceId);
 }

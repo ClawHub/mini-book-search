@@ -14,6 +14,7 @@ import com.clawhub.minibooksearch.mapper.BookSourceMapper;
 import com.clawhub.minibooksearch.mapper.ChapterMapper;
 import com.clawhub.minibooksearch.spider.core.Egg;
 import com.clawhub.minibooksearch.spider.core.EggResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.cookie.Cookie;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,11 +23,14 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +41,7 @@ import java.util.List;
  * @taskId <br>
  * @create 2018-10-15 21:28<br>
  */
-@Component
+@Component("www.qidian.com")
 public class Qidian implements Egg {
     /**
      * The Logger.
@@ -61,6 +65,23 @@ public class Qidian implements Egg {
      */
     @Autowired
     private ChapterMapper chapterMapper;
+
+    /**
+     * The Book duplicate removal redis key prefix.
+     */
+    @Value("${redis.key.prefix.book.duplicate.removal}")
+    private String bookDuplicateRemovalRedisKeyPrefix;
+
+    /**
+     * 最多解析书籍条数
+     */
+    @Value("${parse.search.keyword.max.num}")
+    private int maxNum;
+    /**
+     * The String redis template.
+     */
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 爬虫入口
@@ -109,10 +130,15 @@ public class Qidian implements Egg {
         logger.info("解析查询到的第一页数据");
         Document document = Jsoup.parse(html);
         Elements elements = document.select(".book-img-text li");
+        int num = 0;
         for (Element element : elements) {
+            //控制解析的数量
+            num++;
+            if (num > maxNum) {
+                return;
+            }
             //解析单条数据
             parseSingleBook(element);
-
         }
     }
 
@@ -123,27 +149,49 @@ public class Qidian implements Egg {
      */
     private void parseSingleBook(Element element) {
         logger.info("解析单条数据");
-        //获取图片url
-        String picUrl = element.select(".book-img-box img").first().attr("src");
         //获取书名
         String name = element.select(".book-mid-info a").first().text();
         //获取作者
         String auther = element.select(".book-mid-info .author").select(".name, i").text();
-        //分类
-        String classify = element.select(".book-mid-info .author a:not(.name)").text();
-        //状态
-        String state = element.select(".book-mid-info .author span").text();
-        //简介
-        String remark = element.select(".book-mid-info .intro").text();
-        //总字数
-        String numberStr = element.select(".book-right-info .total span").first().text();
-        int number;
-        int indexOf = numberStr.indexOf("万");
-        if (indexOf > -1) {
-            numberStr = numberStr.substring(0, indexOf);
-            number = (int) (Double.parseDouble(numberStr) * 10000);
-        } else {
-            number = Integer.parseInt(numberStr);
+        //redis去重key
+        String checkKey = bookDuplicateRemovalRedisKeyPrefix + name.trim() + "-" + auther.trim();
+        //bookId
+        String bookId = stringRedisTemplate.opsForValue().get(checkKey);
+        logger.info("bookId:{}", bookId);
+        if (StringUtils.isBlank(bookId)) {
+            //获取图片url
+            String picUrl = element.select(".book-img-box img").first().attr("src");
+            //分类
+            String classify = element.select(".book-mid-info .author a:not(.name)").text();
+            //状态
+            String state = element.select(".book-mid-info .author span").text();
+            //简介
+            String remark = element.select(".book-mid-info .intro").text();
+            //总字数
+            String numberStr = element.select(".book-right-info .total span").first().text();
+            int number;
+            int indexOf = numberStr.indexOf("万");
+            if (indexOf > -1) {
+                numberStr = numberStr.substring(0, indexOf);
+                number = (int) (Double.parseDouble(numberStr) * 10000);
+            } else {
+                number = Integer.parseInt(numberStr);
+            }
+            bookId = IDGenarator.getID();
+            //书籍基本信息入库
+            logger.info("书籍基本信息入库 name:{},auther:{}", name, auther);
+            BookInfo bookinfo = new BookInfo();
+            bookinfo.setAuther(auther);
+            bookinfo.setClassify(classify);
+            bookinfo.setId(bookId);
+            bookinfo.setName(name);
+            bookinfo.setNumber(number);
+            bookinfo.setPicUrl(picUrl);
+            bookinfo.setRemark(remark);
+            bookinfo.setState(state);
+            bookInfoMapper.insert(bookinfo);
+            //去重
+            stringRedisTemplate.opsForValue().set(checkKey, bookId);
         }
         //更新时间
         String updateTime = element.select(".book-mid-info .update span").first().text();
@@ -154,52 +202,34 @@ public class Qidian implements Egg {
         //目录链接
         String catalogUrl = url + "#Catalog";
 
-        //书籍基本信息入库
-        logger.info("书籍基本信息入库");
-        String bookId = IDGenarator.getID();
-        BookInfo bookinfo = new BookInfo();
-        bookinfo.setAuther(auther);
-        bookinfo.setClassify(classify);
-        bookinfo.setId(bookId);
-        bookinfo.setName(name);
-        bookinfo.setNumber(number);
-        bookinfo.setPicUrl(picUrl);
-        bookinfo.setRemark(remark);
-        bookinfo.setState(state);
-        bookInfoMapper.insert(bookinfo);
 
         //书籍源信息入库
-        logger.info("书籍源信息入库");
-        String sourceId = IDGenarator.getID();
+        logger.info("书籍源信息入库 website:起点中文网");
         BookSource bookSource = new BookSource();
         bookSource.setBookId(bookId);
         bookSource.setCatalogUrl(catalogUrl);
-        bookSource.setSourceId(sourceId);
+        bookSource.setSourceId(dataBid);
         bookSource.setUpdateTime(updateTime);
         bookSource.setUrl(url);
-        bookSource.setWebSite("起点中文网");
+        bookSource.setWebSite("www.qidian.com");
         bookSourceMapper.insert(bookSource);
 
-        //获取token
-        String token = getToken(catalogUrl);
 
         //获取章节
-        category(token, dataBid, sourceId);
+//        category(catalogUrl, dataBid);
 
 
     }
 
-    /**
-     * 获取章节
-     *
-     * @param token    the token
-     * @param dataBid  the data bid
-     * @param sourceId the source id
-     */
-    private void category(String token, String dataBid, String sourceId) {
+    @Override
+    public List<Chapter> chapter(String catalogUrl, String sourceId) {
+        List<Chapter> chapters = new ArrayList<>();
+        //获取token
+        String token = getToken(catalogUrl);
+
         logger.info("获取章节");
         //获取章节
-        HttpResInfo catalogRes = HttpGenerator.sendGet("https://book.qidian.com/ajax/book/category?_csrfToken=" + token + "&bookId=" + dataBid, 6000, 6000, null, false);
+        HttpResInfo catalogRes = HttpGenerator.sendGet("https://book.qidian.com/ajax/book/category?_csrfToken=" + token + "&bookId=" + sourceId, 6000, 6000, null, false);
         if (catalogRes.isSuccess()) {
             JSONObject body = JSONObject.parseObject(catalogRes.getResult());
             JSONObject data = body.getJSONObject("data");
@@ -233,7 +263,7 @@ public class Qidian implements Egg {
                             String number = cnt;
 
                             //章节数据入库
-                            logger.info("章节数据入库");
+                            logger.info("章节名称:{}", name);
                             Chapter chapter = new Chapter();
                             chapter.setDateTime(dateTime);
                             chapter.setId(IDGenarator.getID());
@@ -242,13 +272,15 @@ public class Qidian implements Egg {
                             chapter.setSort(sort);
                             chapter.setSourceId(sourceId);
                             chapter.setUrl(url);
-                            chapterMapper.insert(chapter);
+                            chapters.add(chapter);
+//                            chapterMapper.insert(chapter);
                         }
 
                     }
                 }
             }
         }
+        return chapters;
     }
 
     /**

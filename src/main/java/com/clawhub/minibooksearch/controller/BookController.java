@@ -87,7 +87,9 @@ public class BookController {
     public String searchChapter(@RequestBody String param) {
         JSONObject body = JSONObject.parseObject(param);
         String sourceId = body.getString("sourceId");
-        return bookService.searchChapter(sourceId);
+        String catalogUrl = body.getString("catalogUrl");
+        String webSite = body.getString("webSite");
+        return spiderService.searchChapter(webSite, catalogUrl, sourceId);
     }
 
 }
