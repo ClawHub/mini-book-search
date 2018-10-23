@@ -23,6 +23,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +65,17 @@ public class Qidian implements Egg {
     @Autowired
     private ChapterMapper chapterMapper;
 
+    /**
+     * The Book duplicate removal redis key prefix.
+     */
+    @Value("${redis.key.prefix.book.duplicate.removal}")
+    private String bookDuplicateRemovalRedisKeyPrefix;
+
+    /**
+     * 最多解析书籍条数
+     */
+    @Value("${parse.search.keyword.max.num}")
+    private int maxNum;
     /**
      * The String redis template.
      */
@@ -117,10 +129,15 @@ public class Qidian implements Egg {
         logger.info("解析查询到的第一页数据");
         Document document = Jsoup.parse(html);
         Elements elements = document.select(".book-img-text li");
+        int num = 0;
         for (Element element : elements) {
+            //控制解析的数量
+            num++;
+            if (num > maxNum) {
+                return;
+            }
             //解析单条数据
             parseSingleBook(element);
-
         }
     }
 
@@ -136,9 +153,10 @@ public class Qidian implements Egg {
         //获取作者
         String auther = element.select(".book-mid-info .author").select(".name, i").text();
         //redis去重key
-        String checkKey = name.trim() + "-" + auther.trim();
+        String checkKey = bookDuplicateRemovalRedisKeyPrefix + name.trim() + "-" + auther.trim();
         //bookId
         String bookId = stringRedisTemplate.opsForValue().get(checkKey);
+        logger.info("bookId:{}", bookId);
         if (StringUtils.isBlank(bookId)) {
             //获取图片url
             String picUrl = element.select(".book-img-box img").first().attr("src");
@@ -160,7 +178,7 @@ public class Qidian implements Egg {
             }
             bookId = IDGenarator.getID();
             //书籍基本信息入库
-            logger.info("书籍基本信息入库");
+            logger.info("书籍基本信息入库 name:{},auther:{}", name, auther);
             BookInfo bookinfo = new BookInfo();
             bookinfo.setAuther(auther);
             bookinfo.setClassify(classify);
@@ -171,6 +189,7 @@ public class Qidian implements Egg {
             bookinfo.setRemark(remark);
             bookinfo.setState(state);
             bookInfoMapper.insert(bookinfo);
+            //去重
             stringRedisTemplate.opsForValue().set(checkKey, bookId);
         }
         //更新时间
@@ -184,8 +203,8 @@ public class Qidian implements Egg {
 
 
         //书籍源信息入库
-        logger.info("书籍源信息入库");
-        String sourceId = IDGenarator.getID();
+        logger.info("书籍源信息入库 website:起点中文网");
+        String sourceId = "www.qidian.com";
         BookSource bookSource = new BookSource();
         bookSource.setBookId(bookId);
         bookSource.setCatalogUrl(catalogUrl);
@@ -195,11 +214,9 @@ public class Qidian implements Egg {
         bookSource.setWebSite("起点中文网");
         bookSourceMapper.insert(bookSource);
 
-        //获取token
-        String token = getToken(catalogUrl);
 
         //获取章节
-        category(token, dataBid, sourceId);
+        category(catalogUrl, dataBid, sourceId);
 
 
     }
@@ -207,11 +224,14 @@ public class Qidian implements Egg {
     /**
      * 获取章节
      *
-     * @param token    the token
-     * @param dataBid  the data bid
-     * @param sourceId the source id
+     * @param catalogUrl 目录url
+     * @param dataBid    the data bid
+     * @param sourceId   the source id
      */
-    private void category(String token, String dataBid, String sourceId) {
+    private void category(String catalogUrl, String dataBid, String sourceId) {
+        //获取token
+        String token = getToken(catalogUrl);
+
         logger.info("获取章节");
         //获取章节
         HttpResInfo catalogRes = HttpGenerator.sendGet("https://book.qidian.com/ajax/book/category?_csrfToken=" + token + "&bookId=" + dataBid, 6000, 6000, null, false);
@@ -248,7 +268,7 @@ public class Qidian implements Egg {
                             String number = cnt;
 
                             //章节数据入库
-                            logger.info("章节数据入库");
+                            logger.info("章节数据入库 name:{}", name);
                             Chapter chapter = new Chapter();
                             chapter.setDateTime(dateTime);
                             chapter.setId(IDGenarator.getID());
