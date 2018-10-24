@@ -20,10 +20,10 @@ public class BookInfo {
     /**
      * 作者
      */
-    private String auther;
+    private String author;
 
     /**
-     * 站点 0:女 1:男  
+     * 站点 0:女 1:男
      */
     private String site;
 
@@ -97,34 +97,34 @@ public class BookInfo {
     /**
      * 获取作者
      *
-     * @return auther - 作者
+     * @return author - 作者
      */
-    public String getAuther() {
-        return auther;
+    public String getAuthor() {
+        return author;
     }
 
     /**
      * 设置作者
      *
-     * @param auther 作者
+     * @param author 作者
      */
-    public void setAuther(String auther) {
-        this.auther = auther;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     /**
-     * 获取站点 0:女 1:男  
+     * 获取站点 0:女 1:男
      *
-     * @return site - 站点 0:女 1:男  
+     * @return site - 站点 0:女 1:男
      */
     public String getSite() {
         return site;
     }
 
     /**
-     * 设置站点 0:女 1:男  
+     * 设置站点 0:女 1:男
      *
-     * @param site 站点 0:女 1:男  
+     * @param site 站点 0:女 1:男
      */
     public void setSite(String site) {
         this.site = site;
@@ -235,6 +235,37 @@ public class BookInfo {
      * @param picUrl 图片链接
      */
     public void setPicUrl(String picUrl) {
+        this.picUrl = picUrl;
+    }
+
+    /**
+     * Instantiates a new Book info.
+     */
+    public BookInfo() {
+    }
+
+    /**
+     * Instantiates a new Book info.
+     *
+     * @param name      the name
+     * @param author    the author
+     * @param site      the site
+     * @param classify  the classify
+     * @param state     the state
+     * @param attribute the attribute
+     * @param number    the number
+     * @param remark    the remark
+     * @param picUrl    the pic url
+     */
+    public BookInfo(String name, String author, String site, String classify, String state, String attribute, Integer number, String remark, String picUrl) {
+        this.name = name;
+        this.author = author;
+        this.site = site;
+        this.classify = classify;
+        this.state = state;
+        this.attribute = attribute;
+        this.number = number;
+        this.remark = remark;
         this.picUrl = picUrl;
     }
 }

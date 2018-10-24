@@ -149,4 +149,27 @@ public class BookSource {
     public void setWebSite(String webSite) {
         this.webSite = webSite;
     }
+
+    /**
+     * Instantiates a new Book source.
+     */
+    public BookSource() {
+    }
+
+    /**
+     * Instantiates a new Book source.
+     *
+     * @param sourceId   the source id
+     * @param url        the url
+     * @param updateTime the update time
+     * @param catalogUrl the catalog url
+     * @param webSite    the web site
+     */
+    public BookSource(String sourceId, String url, String updateTime, String catalogUrl, String webSite) {
+        this.sourceId = sourceId;
+        this.url = url;
+        this.updateTime = updateTime;
+        this.catalogUrl = catalogUrl;
+        this.webSite = webSite;
+    }
 }

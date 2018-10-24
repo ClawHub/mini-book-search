@@ -1,6 +1,7 @@
 package com.clawhub.minibooksearch.spider.core;
 
 import com.clawhub.minibooksearch.entity.Chapter;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ public interface Egg {
      *
      * @param keyword 关键词
      */
+    @Transactional
     EggResult touch(String keyword);
 
     /**
