@@ -30,4 +30,12 @@ public interface Egg {
      * @return 章节列表
      */
     List<Chapter> chapter(String catalogUrl, String sourceId);
+
+    /**
+     * 阅读章节
+     *
+     * @param chapterUrl 章节url
+     * @return 文本
+     */
+    String read(String chapterUrl);
 }

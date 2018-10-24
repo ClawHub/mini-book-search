@@ -38,4 +38,12 @@ public class SpiderServiceImpl implements SpiderService {
         List<Chapter> chapters = egg.chapter(catalogUrl, sourceId);
         return ResultUtil.getSucc(chapters);
     }
+
+    @Override
+    public String readChapter(String webSite, String chapterUrl) {
+        Egg egg = (Egg) SpringContextHelper.getBean(webSite);
+        String content = egg.read(chapterUrl);
+        return ResultUtil.getSucc(content);
+    }
+
 }

@@ -5,7 +5,6 @@ import com.clawhub.minibooksearch.core.http.HttpResInfo;
 import com.clawhub.minibooksearch.core.util.IDGenarator;
 import com.clawhub.minibooksearch.entity.BookInfo;
 import com.clawhub.minibooksearch.entity.BookSource;
-import com.clawhub.minibooksearch.entity.Chapter;
 import com.clawhub.minibooksearch.mapper.BookInfoMapper;
 import com.clawhub.minibooksearch.mapper.BookSourceMapper;
 import com.clawhub.minibooksearch.mapper.ChapterMapper;
@@ -19,8 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
-import java.util.List;
 
 /**
  * <Description>爬虫抽象类<br>
@@ -252,7 +249,4 @@ public abstract class AbstractEgg implements Egg {
      * @return the book source
      */
     protected abstract BookSource getBookSource(Element element);
-
-
-    public abstract List<Chapter> chapter(String catalogUrl, String sourceId);
 }
