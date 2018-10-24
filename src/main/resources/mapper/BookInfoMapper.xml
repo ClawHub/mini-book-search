@@ -7,7 +7,7 @@
     -->
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="auther" jdbcType="VARCHAR" property="auther" />
+    <result column="author" jdbcType="VARCHAR" property="author" />
     <result column="site" jdbcType="VARCHAR" property="site" />
     <result column="classify" jdbcType="VARCHAR" property="classify" />
     <result column="state" jdbcType="VARCHAR" property="state" />

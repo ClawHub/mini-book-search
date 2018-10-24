@@ -7,7 +7,7 @@ create table t_book_info
 (
    id                   varchar(256) not null comment '书籍id',
    name                 varchar(128) comment '书名',
-   auther               varchar(64) comment '作者',
+   author               varchar(64) comment '作者',
    site                 varchar(1) comment '站点 0:女 1:男  ',
    classify             varchar(2) comment '分类 0：玄幻 1：奇幻 2：武侠 3：仙侠 4：都市 。。。。',
    state                varchar(1) comment '状态 0：连载 1：完本',
