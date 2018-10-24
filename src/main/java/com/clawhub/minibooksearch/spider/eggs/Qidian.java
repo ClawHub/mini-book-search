@@ -73,6 +73,12 @@ public class Qidian implements Egg {
     private String bookDuplicateRemovalRedisKeyPrefix;
 
     /**
+     * The Source duplicate removal redis key prefix.
+     */
+    @Value("${redis.key.prefix.source.duplicate.removal}")
+    private String sourceDuplicateRemovalRedisKeyPrefix;
+
+    /**
      * 最多解析书籍条数
      */
     @Value("${parse.search.keyword.max.num}")
@@ -154,9 +160,9 @@ public class Qidian implements Egg {
         //获取作者
         String auther = element.select(".book-mid-info .author").select(".name, i").text();
         //redis去重key
-        String checkKey = bookDuplicateRemovalRedisKeyPrefix + name.trim() + "-" + auther.trim();
+        String checkBookKey = bookDuplicateRemovalRedisKeyPrefix + name.trim() + "-" + auther.trim();
         //bookId
-        String bookId = stringRedisTemplate.opsForValue().get(checkKey);
+        String bookId = stringRedisTemplate.opsForValue().get(checkBookKey);
         logger.info("bookId:{}", bookId);
         if (StringUtils.isBlank(bookId)) {
             //获取图片url
@@ -191,34 +197,36 @@ public class Qidian implements Egg {
             bookinfo.setState(state);
             bookInfoMapper.insert(bookinfo);
             //去重
-            stringRedisTemplate.opsForValue().set(checkKey, bookId);
+            stringRedisTemplate.opsForValue().set(checkBookKey, bookId);
         }
-        //更新时间
-        String updateTime = element.select(".book-mid-info .update span").first().text();
-        //url
-        String url = "https:" + element.select(".book-mid-info h4 a").attr("href");
+        String webSite = "www.qidian.com";
         //dataBid
         String dataBid = element.select(".book-mid-info h4 a").attr("data-bid");
-        //目录链接
-        String catalogUrl = url + "#Catalog";
-
-
-        //书籍源信息入库
-        logger.info("书籍源信息入库 website:起点中文网");
-        BookSource bookSource = new BookSource();
-        bookSource.setBookId(bookId);
-        bookSource.setCatalogUrl(catalogUrl);
-        bookSource.setSourceId(dataBid);
-        bookSource.setUpdateTime(updateTime);
-        bookSource.setUrl(url);
-        bookSource.setWebSite("www.qidian.com");
-        bookSourceMapper.insert(bookSource);
-
-
-        //获取章节
-//        category(catalogUrl, dataBid);
-
-
+        //redis去重key
+        String checkSourceKey = sourceDuplicateRemovalRedisKeyPrefix + webSite.trim() + "-" + dataBid.trim();
+        //sourceId
+        String sourceId = stringRedisTemplate.opsForValue().get(checkSourceKey);
+        logger.info("sourceId:{}", sourceId);
+        if (StringUtils.isBlank(sourceId)) {
+            //更新时间
+            String updateTime = element.select(".book-mid-info .update span").first().text();
+            //url
+            String url = "https:" + element.select(".book-mid-info h4 a").attr("href");
+            //目录链接
+            String catalogUrl = url + "#Catalog";
+            //书籍源信息入库
+            logger.info("书籍源信息入库 website:起点中文网");
+            BookSource bookSource = new BookSource();
+            bookSource.setBookId(bookId);
+            bookSource.setCatalogUrl(catalogUrl);
+            bookSource.setSourceId(dataBid);
+            bookSource.setUpdateTime(updateTime);
+            bookSource.setUrl(url);
+            bookSource.setWebSite(webSite);
+            bookSourceMapper.insert(bookSource);
+            //去重
+            stringRedisTemplate.opsForValue().set(checkSourceKey, dataBid);
+        }
     }
 
     @Override
