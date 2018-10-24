@@ -11,6 +11,7 @@ import com.clawhub.minibooksearch.entity.BookSource;
 import com.clawhub.minibooksearch.entity.Chapter;
 import com.clawhub.minibooksearch.spider.core.AbstractEgg;
 import org.apache.http.cookie.Cookie;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -154,6 +155,7 @@ public class Qidian extends AbstractEgg {
         return chapters;
     }
 
+
     /**
      * Gets token.
      *
@@ -175,4 +177,16 @@ public class Qidian extends AbstractEgg {
         return "";
     }
 
+    @Override
+    public String read(String chapterUrl) {
+        //请求
+        HttpResInfo httpResInfo = HttpGenerator.sendGet(chapterUrl, 6000, 6000, null, false);
+        if (httpResInfo.getSuccess()) {
+            String html = httpResInfo.getResult();
+            Document document = Jsoup.parse(html);
+            String content = document.select(".read-content").select(".j_readContent").text();
+            return content.replaceAll("　　","");
+        }
+        return null;
+    }
 }

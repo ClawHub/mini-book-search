@@ -92,4 +92,18 @@ public class BookController {
         return spiderService.searchChapter(webSite, catalogUrl, sourceId);
     }
 
+    /**
+     * Read chapter string.
+     *
+     * @param param the param
+     * @return the string
+     */
+    @PostMapping("readChapter")
+    public String readChapter(@RequestBody String param) {
+        JSONObject body = JSONObject.parseObject(param);
+        String chapterUrl = body.getString("chapterUrl");
+        String webSite = body.getString("webSite");
+        return spiderService.readChapter(webSite, chapterUrl);
+    }
+
 }

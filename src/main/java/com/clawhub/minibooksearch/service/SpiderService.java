@@ -26,4 +26,13 @@ public interface SpiderService {
      * @return 章节信息
      */
     String searchChapter(String webSite, String catalogUrl, String sourceId);
+
+    /**
+     * 阅读章节
+     *
+     * @param webSite    站点
+     * @param chapterUrl 章节url
+     * @return 文章内容
+     */
+    String readChapter(String webSite, String chapterUrl);
 }
