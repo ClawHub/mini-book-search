@@ -13,4 +13,9 @@ public class MessageConstant {
      * 入参异常
      */
     public static final String PATAM_ERROR = "2002";
+    /**
+     * 书架中已存在
+     */
+    public static final String BOOK_SHELF_EXIST = "30000";
+
 }

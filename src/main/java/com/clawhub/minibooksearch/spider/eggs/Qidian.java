@@ -187,8 +187,13 @@ public class Qidian extends AbstractEgg {
         if (httpResInfo.getSuccess()) {
             String html = httpResInfo.getResult();
             Document document = Jsoup.parse(html);
-            String content = document.select(".read-content").select(".j_readContent").text();
-            return content.replaceAll("　　", "");
+            Elements elements = document.select(".read-content").select(".j_readContent p");
+            StringBuilder sb = new StringBuilder();
+            for (Element element : elements) {
+                sb.append(element.text())
+                        .append("\n");
+            }
+            return sb.toString();
         }
         return null;
     }
