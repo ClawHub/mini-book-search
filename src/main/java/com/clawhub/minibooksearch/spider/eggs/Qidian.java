@@ -95,8 +95,8 @@ public class Qidian extends AbstractEgg {
 
 
     @Override
-    public Map<Integer, Chapter> chapter(String catalogUrl, String sourceId) {
-        Map<Integer, Chapter> chapters = new HashMap<>();
+    public Map<String, Chapter> chapter(String catalogUrl, String sourceId) {
+        Map<String, Chapter> chapters = new HashMap<>();
         int num = 0;
         //获取token
         String token = getToken(catalogUrl);
@@ -147,7 +147,7 @@ public class Qidian extends AbstractEgg {
                             chapter.setSourceId(sourceId);
                             chapter.setUrl(url);
                             //收集
-                            chapters.put(num, chapter);
+                            chapters.put(String.valueOf(num), chapter);
                             num++;
                         }
 

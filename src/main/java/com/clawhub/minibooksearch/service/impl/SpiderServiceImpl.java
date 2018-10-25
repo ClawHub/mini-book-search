@@ -35,7 +35,7 @@ public class SpiderServiceImpl implements SpiderService {
     @Override
     public String searchChapter(String webSite, String catalogUrl, String sourceId) {
         Egg egg = (Egg) SpringContextHelper.getBean(webSite);
-        Map<Integer, Chapter> chapters = egg.chapter(catalogUrl, sourceId);
+        Map<String, Chapter> chapters = egg.chapter(catalogUrl, sourceId);
         return ResultUtil.getSucc(chapters);
     }
 

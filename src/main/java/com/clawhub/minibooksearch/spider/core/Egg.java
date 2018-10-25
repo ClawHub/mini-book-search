@@ -29,7 +29,7 @@ public interface Egg {
      * @param sourceId   sourceId
      * @return 章节列表
      */
-    Map<Integer, Chapter> chapter(String catalogUrl, String sourceId);
+    Map<String, Chapter> chapter(String catalogUrl, String sourceId);
 
     /**
      * 阅读章节
