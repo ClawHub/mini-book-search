@@ -9,6 +9,7 @@ import com.clawhub.minibooksearch.spider.queue.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,7 +36,7 @@ public class SpiderServiceImpl implements SpiderService {
     @Override
     public String searchChapter(String webSite, String catalogUrl, String sourceId) {
         Egg egg = (Egg) SpringContextHelper.getBean(webSite);
-        Map<Integer, Chapter> chapters = egg.chapter(catalogUrl, sourceId);
+        List<Map<Integer, Chapter>> chapters = egg.chapter(catalogUrl, sourceId);
         return ResultUtil.getSucc(chapters);
     }
 

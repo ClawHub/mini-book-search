@@ -19,7 +19,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,8 +96,8 @@ public class Qidian extends AbstractEgg {
 
 
     @Override
-    public Map<Integer, Chapter> chapter(String catalogUrl, String sourceId) {
-        Map<Integer, Chapter> chapters = new LinkedHashMap<>();
+    public List<Map<Integer, Chapter>> chapter(String catalogUrl, String sourceId) {
+        List<Map<Integer, Chapter>> list = new ArrayList<>();
         int num = 0;
         //获取token
         String token = getToken(catalogUrl);
@@ -147,15 +148,17 @@ public class Qidian extends AbstractEgg {
                             chapter.setSourceId(sourceId);
                             chapter.setUrl(url);
                             //收集
+                            Map<Integer, Chapter> chapters = new HashMap<>();
                             chapters.put(num, chapter);
                             num++;
+                            list.add(chapters);
                         }
 
                     }
                 }
             }
         }
-        return chapters;
+        return list;
     }
 
 
