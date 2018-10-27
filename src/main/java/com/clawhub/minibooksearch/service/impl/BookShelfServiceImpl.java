@@ -62,7 +62,7 @@ public class BookShelfServiceImpl implements BookShelfService {
         //判断是否加入过书架
         boolean flag = stringRedisTemplate.opsForSet().isMember(bookShelfRedisKeyPrefix + openId, bookId);
         if (flag) {
-            return ResultUtil.getError(MessageConstant.BOOK_SHELF_EXIST);
+            return ResultUtil.getSucc(MessageConstant.BOOK_SHELF_EXIST);
         }
         BookShelf bookShelf = new BookShelf();
         bookShelf.setBookId(bookId);
