@@ -3,6 +3,7 @@ package com.clawhub.minibooksearch.spider.core;
 import com.clawhub.minibooksearch.entity.Chapter;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public interface Egg {
      * @param sourceId   sourceId
      * @return 章节列表
      */
-    Map<String, Chapter> chapter(String catalogUrl, String sourceId);
+    Map<String, Chapter> chapter(String catalogUrl, String sourceId) throws IOException;
 
     /**
      * 阅读章节
@@ -37,5 +38,5 @@ public interface Egg {
      * @param chapterUrl 章节url
      * @return 文本
      */
-    String read(String chapterUrl);
+    String read(String chapterUrl) throws IOException;
 }
