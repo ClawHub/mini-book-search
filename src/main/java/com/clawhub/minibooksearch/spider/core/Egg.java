@@ -3,7 +3,7 @@ package com.clawhub.minibooksearch.spider.core;
 import com.clawhub.minibooksearch.entity.Chapter;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * <Description>爬虫统一接口<br>
@@ -29,7 +29,7 @@ public interface Egg {
      * @param sourceId   sourceId
      * @return 章节列表
      */
-    List<Chapter> chapter(String catalogUrl, String sourceId);
+    Map<String, Chapter> chapter(String catalogUrl, String sourceId);
 
     /**
      * 阅读章节

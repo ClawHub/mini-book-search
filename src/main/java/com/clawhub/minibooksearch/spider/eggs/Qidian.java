@@ -19,8 +19,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <Description> 起点中文网<br>
@@ -94,8 +95,9 @@ public class Qidian extends AbstractEgg {
 
 
     @Override
-    public List<Chapter> chapter(String catalogUrl, String sourceId) {
-        List<Chapter> chapters = new ArrayList<>();
+    public Map<String, Chapter> chapter(String catalogUrl, String sourceId) {
+        Map<String, Chapter> chapters = new HashMap<>();
+        int num = 0;
         //获取token
         String token = getToken(catalogUrl);
 
@@ -145,7 +147,8 @@ public class Qidian extends AbstractEgg {
                             chapter.setSourceId(sourceId);
                             chapter.setUrl(url);
                             //收集
-                            chapters.add(chapter);
+                            chapters.put(String.valueOf(num), chapter);
+                            num++;
                         }
 
                     }
@@ -184,8 +187,13 @@ public class Qidian extends AbstractEgg {
         if (httpResInfo.getSuccess()) {
             String html = httpResInfo.getResult();
             Document document = Jsoup.parse(html);
-            String content = document.select(".read-content").select(".j_readContent").text();
-            return content.replaceAll("　　","");
+            Elements elements = document.select(".read-content").select(".j_readContent p");
+            StringBuilder sb = new StringBuilder();
+            for (Element element : elements) {
+                sb.append(element.text())
+                        .append("\n");
+            }
+            return sb.toString();
         }
         return null;
     }
