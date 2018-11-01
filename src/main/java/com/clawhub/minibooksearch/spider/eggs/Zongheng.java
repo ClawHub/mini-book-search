@@ -129,7 +129,7 @@ public class Zongheng extends AbstractEgg {
             chapters.put(String.valueOf(num), chapter);
             num++;
         }
-        return null;
+        return chapters;
     }
 
     @Override
