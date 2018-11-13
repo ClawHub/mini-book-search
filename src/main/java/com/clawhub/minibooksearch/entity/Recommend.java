@@ -18,6 +18,17 @@ public class Recommend {
     private String book;
 
     /**
+     * 推荐榜类型
+     */
+    @Column(name = "data_type")
+    private String dataType;
+
+    /**
+     * 书籍所属渠道类型
+     */
+    private String channel;
+
+    /**
      * 创建时间
      */
     @Column(name = "create_time")
@@ -74,6 +85,55 @@ public class Recommend {
      * @param createTime 创建时间
      */
     public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取推荐类型
+     * @return
+     */
+    public String getDataType() {
+        return dataType;
+    }
+
+    /**
+     * 设置推荐类型
+     * @param dataType
+     */
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
+    }
+
+    /**
+     * 获取书籍所属类型
+     * @return
+     */
+    public String getChannel() {
+        return channel;
+    }
+
+    /**
+     * 设置书籍所属类型
+     * @param channel
+     */
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public Recommend(){
+
+    }
+    /**
+     * 构造
+     * @param book
+     * @param dataType
+     * @param channel
+     * @param createTime
+     */
+    public Recommend(String book, String dataType, String channel,Long createTime){
+        this.book = book;
+        this.dataType = dataType;
+        this.channel = channel;
         this.createTime = createTime;
     }
 }

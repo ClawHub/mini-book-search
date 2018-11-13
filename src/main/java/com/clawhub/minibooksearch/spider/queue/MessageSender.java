@@ -30,4 +30,12 @@ public class MessageSender {
     public void sendMessage(String keyword) {
         stringRedisTemplate.convertAndSend("keyword", keyword);
     }
+
+    /**
+     * 创建一个名为recommend的通道
+     * @param keyword
+     */
+    public void sendRecommendMessage(String keyword){
+        stringRedisTemplate.convertAndSend("recommend", keyword);
+    }
 }

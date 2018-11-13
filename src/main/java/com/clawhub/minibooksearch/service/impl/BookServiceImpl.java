@@ -59,15 +59,18 @@ public class BookServiceImpl implements BookService {
      *
      * @param pageNum  页数
      * @param pageSize 每页数据量
+     * @param dataType 推荐榜类型
+     * @param channel 书籍分类
      * @return 推荐书籍
      */
     @Override
-    public String recommend(int pageNum, int pageSize) {
+    public String recommend(int pageNum, int pageSize, String dataType, String channel) {
         if (pageSize >= 500) {
             return ResultUtil.getError(MessageConstant.PATAM_ERROR);
         }
         Page<Recommend> page = PageHelper.startPage(pageNum, pageSize);
-        List<Recommend> list = recommendMapper.selectAll();
+        List<Recommend> list = recommendMapper.searchRecommend(dataType,channel);
+        System.out.println("查询到的集合大小为" + list.size());
         page.getTotal();
         JSONObject pageObject = new JSONObject();
         pageObject.put(ParamConstant.PAGE_ROWS, list);

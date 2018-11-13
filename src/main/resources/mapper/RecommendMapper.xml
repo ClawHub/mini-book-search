@@ -7,6 +7,14 @@
     -->
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="book" jdbcType="VARCHAR" property="book" />
+    <result column="data_type" jdbcType="VARCHAR" property="dataType" />
+    <result column="channel" jdbcType="VARCHAR" property="channel" />
     <result column="create_time" jdbcType="BIGINT" property="createTime" />
   </resultMap>
+  <!--查询推荐榜单根据榜单类型和书籍类型-->
+  <select id="searchRecommend" resultMap="BaseResultMap">
+    SELECT *
+    FROM t_recommend
+    WHERE data_type = #{dataType} and channel = #{channel}
+  </select>
 </mapper>

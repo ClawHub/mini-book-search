@@ -9,6 +9,7 @@ import com.clawhub.minibooksearch.spider.queue.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -33,16 +34,32 @@ public class SpiderServiceImpl implements SpiderService {
     }
 
     @Override
-    public String searchChapter(String webSite, String catalogUrl, String sourceId) {
+    public void searchRecommendCollection(String dataType,String channel){
+        String keyword = "recommend=" + dataType + "=" + channel;
+        messageSender.sendRecommendMessage(keyword);
+    }
+
+    @Override
+    public String searchChapter(String webSite, String catalogUrl, String sourceId)  {
         Egg egg = (Egg) SpringContextHelper.getBean(webSite);
-        Map<String, Chapter> chapters = egg.chapter(catalogUrl, sourceId);
+        Map<String, Chapter> chapters = null;
+        try {
+            chapters = egg.chapter(catalogUrl, sourceId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return ResultUtil.getSucc(chapters);
     }
 
     @Override
     public String readChapter(String webSite, String chapterUrl) {
         Egg egg = (Egg) SpringContextHelper.getBean(webSite);
-        String content = egg.read(chapterUrl);
+        String content = null;
+        try {
+            content = egg.read(chapterUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return ResultUtil.getSucc(content);
     }
 

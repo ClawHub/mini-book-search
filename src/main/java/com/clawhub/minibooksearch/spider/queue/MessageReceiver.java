@@ -29,7 +29,7 @@ public class MessageReceiver {
      *
      * @param message the message
      */
-    public void receiveMessage(String message) {
+    public void receiveMessage(String message) throws Exception {
         logger.info("收到一条消息：{}", message);
         //获取所有爬虫
         Map<String, Egg> eggMap = SpringContextHelper.getApplicationContext().getBeansOfType(Egg.class);

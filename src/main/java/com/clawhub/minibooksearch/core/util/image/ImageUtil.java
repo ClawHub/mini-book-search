@@ -25,7 +25,7 @@ public class ImageUtil {
      * @throws IOException the io exception
      */
     public static void byte2image(byte[] data, String path) throws IOException {
-        if (data.length < 3 || path.equals("")) {
+        if (data.length < 3 || "".equals(path)) {
             return;
         }
         FileImageOutputStream imageOutput = new FileImageOutputStream(new File(path));
@@ -46,16 +46,16 @@ public class ImageUtil {
      */
     public static ImageBean resizeImage(byte[] bytes, String desPath, int scaleSize) throws IOException {
         BufferedImage bi = ImageIO.read(new ByteArrayInputStream(bytes));
-        float width = bi.getWidth(); // 像素
-        float height = bi.getHeight(); // 像素
+        //宽度 像素
+        float width = bi.getWidth();
+        //高度 像素
+        float height = bi.getHeight();
         float scale = width / scaleSize;
         BufferedImage buffImg = new BufferedImage(scaleSize, (int) (height / scale), BufferedImage.TYPE_INT_RGB);
         //使用TYPE_INT_RGB修改的图片会变色
         buffImg.getGraphics().drawImage(
                 bi.getScaledInstance(scaleSize, (int) (height / scale), Image.SCALE_SMOOTH), 0, 0, null);
-//        FileImageOutputStream imageOutput = new FileImageOutputStream(new File(desPath));
         ImageIO.write(buffImg, "JPEG", new File(desPath));
-//        imageOutput.close();
         return new ImageBean(width, height, desPath);
     }
 }

@@ -18,6 +18,13 @@ public interface SpiderService {
     void searchKeywordsCollection(String keyword);
 
     /**
+     * 查找推荐榜根据榜类型和书籍类型
+     * @param dataType
+     * @param channel
+     */
+    void searchRecommendCollection(String dataType,String channel);
+
+    /**
      * 实时获取章节信息
      *
      * @param webSite    站点

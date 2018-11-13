@@ -3,11 +3,14 @@ package com.clawhub.minibooksearch.spider.core;
 import com.clawhub.minibooksearch.core.http.HttpGenerator;
 import com.clawhub.minibooksearch.core.http.HttpResInfo;
 import com.clawhub.minibooksearch.core.util.IDGenarator;
+import com.clawhub.minibooksearch.core.util.RedisUtil;
 import com.clawhub.minibooksearch.entity.BookInfo;
 import com.clawhub.minibooksearch.entity.BookSource;
+import com.clawhub.minibooksearch.entity.Recommend;
 import com.clawhub.minibooksearch.mapper.BookInfoMapper;
 import com.clawhub.minibooksearch.mapper.BookSourceMapper;
 import com.clawhub.minibooksearch.mapper.ChapterMapper;
+import com.clawhub.minibooksearch.mapper.RecommendMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
+
 
 /**
  * <Description>爬虫抽象类<br>
@@ -45,15 +48,21 @@ public abstract class AbstractEgg implements Egg {
     protected BookSourceMapper bookSourceMapper;
 
     /**
+     * The Recommend mapper
+     */
+    @Autowired
+    protected RecommendMapper recommendMapper;
+
+    /**
      * The Chapter mapper.
      */
     @Autowired
     protected ChapterMapper chapterMapper;
     /**
-     * The String redis template.
+     * The RedisUtil util
      */
     @Autowired
-    protected StringRedisTemplate stringRedisTemplate;
+    protected RedisUtil util;
     /**
      * The Book duplicate removal redis key prefix.
      */
@@ -78,9 +87,9 @@ public abstract class AbstractEgg implements Egg {
      * @param author   作者
      * @return bookId
      */
-    private String getBookId(String bookName, String author) {
+    private String getBookId(String bookName, String author) throws Exception {
         String key = bookDuplicateRemovalRedisKeyPrefix + bookName + "-" + author;
-        return stringRedisTemplate.opsForValue().get(key);
+        return util.getString(key);
     }
 
     /**
@@ -90,9 +99,9 @@ public abstract class AbstractEgg implements Egg {
      * @param author   作者
      * @param bookId   bookId
      */
-    private void bookInfoDuplicateRemoval(String bookName, String author, String bookId) {
+    private void bookInfoDuplicateRemoval(String bookName, String author, String bookId) throws Exception {
         String key = bookDuplicateRemovalRedisKeyPrefix + bookName + "-" + author;
-        stringRedisTemplate.opsForValue().set(key, bookId);
+        util.set(key, bookId,4320);
     }
 
     /**
@@ -102,9 +111,9 @@ public abstract class AbstractEgg implements Egg {
      * @param sourceId 源书籍ID
      * @return true:已存在  false:不存在
      */
-    private boolean checkBookSource(String webSite, String sourceId) {
+    private boolean checkBookSource(String webSite, String sourceId) throws Exception {
         String key = sourceDuplicateRemovalRedisKeyPrefix + webSite + "-" + sourceId;
-        String value = stringRedisTemplate.opsForValue().get(key);
+        String value = util.getString(key);
         return StringUtils.isNotBlank(value);
     }
 
@@ -114,9 +123,17 @@ public abstract class AbstractEgg implements Egg {
      * @param webSite  站点
      * @param sourceId 源站点书籍ID
      */
-    private void bookSourceDuplicateRemoval(String webSite, String sourceId) {
+    private void bookSourceDuplicateRemoval(String webSite, String sourceId) throws Exception {
         String key = sourceDuplicateRemovalRedisKeyPrefix + webSite + "-" + sourceId;
-        stringRedisTemplate.opsForValue().set(key, "1");
+        util.set(key, "1",4320);
+    }
+
+    /**
+     * 推荐榜单入库
+     * @param recommend
+     */
+    private void insertRecommend(Recommend recommend){
+        recommendMapper.insert(recommend);
     }
 
     /**
@@ -125,7 +142,7 @@ public abstract class AbstractEgg implements Egg {
      * @param bookId     bookId
      * @param bookSource the book source
      */
-    private void insertBookSource(String bookId, BookSource bookSource) {
+    private void insertBookSource(String bookId, BookSource bookSource)  {
         bookSource.setBookId(bookId);
         bookSourceMapper.insert(bookSource);
     }
@@ -141,9 +158,19 @@ public abstract class AbstractEgg implements Egg {
         bookInfoMapper.insert(bookinfo);
     }
 
+    /**
+     *
+     * @param keyword 关键词
+     * @return
+     */
+
     @Override
     public EggResult touch(String keyword) {
-        searchKeyword(keyword);
+        try {
+            searchKeyword(keyword);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -152,8 +179,8 @@ public abstract class AbstractEgg implements Egg {
      *
      * @param keyword the keyword
      */
-    private void searchKeyword(String keyword) {
-        logger.info("查询关键词");
+    private void searchKeyword(String keyword) throws  Exception {
+        logger.info("查询关键词" + keyword);
         String url = getSearchUrl(keyword);
         if (StringUtils.isBlank(url)) {
             return;
@@ -163,10 +190,56 @@ public abstract class AbstractEgg implements Egg {
         //请求成功
         if (resInfo.getSuccess()) {
             String html = resInfo.getResult();
+            //如果是推荐榜单 另一种解析方式
             //解析查询到的第一页数据
-            parseSearchKeyword(html);
+            if(keyword!=null&&keyword.contains("recommend")){
+                String dataType = keyword.split("=")[1];
+                String channel = keyword.split("=")[2];
+                parseRecommend(html,dataType,channel);
+            }else {
+                parseSearchKeyword(html);
+            }
         }
 
+    }
+
+    /**
+     * 解析推荐榜单
+     * @param html
+     * @throws Exception
+     */
+    private void parseRecommend(String html, String dataType, String channel){
+        logger.info("解析查询到的推荐榜！");
+        Document document = Jsoup.parse(html);
+        Elements elements = getBookList(document);
+        int num = 0;
+        for (Element element:elements){
+            num++;
+            if(num > 10 ){
+                return;
+            }
+            //解析单挑数据并入库
+            parseSingleRecommend(element,dataType,channel);
+        }
+    }
+
+    /**
+     * 解析单条推荐榜单数据入库
+     * @param element
+     * @throws Exception
+     */
+    private void  parseSingleRecommend(Element element, String dataType, String channel){
+        logger.info("解析单条推荐榜单数据");
+        Recommend recommend = getRecommend(element,dataType,channel);
+        String bookId = IDGenarator.getID();
+        recommend.setId(bookId);
+        try {
+            insertRecommend(recommend);
+        } catch (Exception e) {
+            logger.info("违反唯一索引，入库失败！");
+            e.printStackTrace();
+            return;
+        }
     }
 
     /**
@@ -174,7 +247,7 @@ public abstract class AbstractEgg implements Egg {
      *
      * @param html the html
      */
-    private void parseSearchKeyword(String html) {
+    private void parseSearchKeyword(String html) throws  Exception {
         logger.info("解析查询到的第一页数据");
         Document document = Jsoup.parse(html);
         Elements elements = getBookList(document);
@@ -195,7 +268,7 @@ public abstract class AbstractEgg implements Egg {
      *
      * @param element the element
      */
-    private void parseSingleBook(Element element) {
+    private void parseSingleBook(Element element) throws Exception {
         //书籍基础信息处理
         BookInfo bookinfo = getBookInfo(element);
         //书籍ID
@@ -249,4 +322,12 @@ public abstract class AbstractEgg implements Egg {
      * @return the book source
      */
     protected abstract BookSource getBookSource(Element element);
+
+    /**
+     * 获取推荐榜信息
+     * @param element the element
+     * @return the recommend
+     */
+    protected abstract Recommend getRecommend(Element element,String dataType, String channel);
+
 }

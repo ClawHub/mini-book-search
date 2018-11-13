@@ -1,8 +1,10 @@
 package com.clawhub.minibooksearch.core.util;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * <Description> 时间工具类<br>
@@ -25,9 +27,19 @@ public class TimeUtil {
      * @param pattern the pattern
      * @return the long
      */
-    public static long StringToMilli(String text, String pattern) {
+    public static long stringToMilli(String text, String pattern) {
         LocalDateTime dateTime = LocalDateTime.parse(text, DateTimeFormatter.ofPattern(pattern));
         return dateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
+    }
+
+    /**
+     * 获取当前系统时间，格式为mmddhhmmss
+     * @return
+     */
+    public static String currentDateTime(){
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMddHHmmss");
+        return simpleDateFormat.format(date);
     }
 
 }

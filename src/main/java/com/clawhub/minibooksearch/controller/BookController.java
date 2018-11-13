@@ -1,6 +1,8 @@
 package com.clawhub.minibooksearch.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.clawhub.minibooksearch.core.constants.BookTypeConstant;
+import com.clawhub.minibooksearch.core.util.CommonUtil;
 import com.clawhub.minibooksearch.service.BookService;
 import com.clawhub.minibooksearch.service.SpiderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * <Description> 数据网关<br>
@@ -43,7 +47,13 @@ public class BookController {
         JSONObject body = JSONObject.parseObject(param);
         int pageNum = body.getIntValue("pageNum");
         int pageSize = body.getIntValue("pageSize");
-        return bookService.recommend(pageNum, pageSize);
+        String dataType = body.getString("dataType");
+        String channel = body.getString("channel");
+        Map<String,String> map = CommonUtil.checkRecommend(dataType,channel);
+        //爬虫异步操作
+        spiderService.searchRecommendCollection(map.get("dataType"), map.get("channel"));
+        //查询数据库
+        return bookService.recommend(pageNum, pageSize,map.get("dataType"), map.get("channel"));
     }
 
     /**

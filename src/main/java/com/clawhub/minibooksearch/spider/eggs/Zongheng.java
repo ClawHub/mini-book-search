@@ -7,6 +7,7 @@ import com.clawhub.minibooksearch.core.util.TimeUtil;
 import com.clawhub.minibooksearch.entity.BookInfo;
 import com.clawhub.minibooksearch.entity.BookSource;
 import com.clawhub.minibooksearch.entity.Chapter;
+import com.clawhub.minibooksearch.entity.Recommend;
 import com.clawhub.minibooksearch.spider.core.AbstractEgg;
 import org.apache.http.cookie.Cookie;
 import org.jsoup.Jsoup;
@@ -32,17 +33,28 @@ import java.util.Map;
  * @CreateDate 2018/10/17 11:01 <br>
  */
 @Component("www.zongheng.com")
-public class Zongheng extends AbstractEgg {
+public class Zongheng{
+    /*
     @Override
     protected String getSearchUrl(String keyword) {
         String url = null;
         try {
-            url = "search.zongheng.com/s?keyword=" + URLEncoder.encode(keyword, "UTF-8");
+            url = "https://search.zongheng.com/s?keyword=" + URLEncoder.encode(keyword, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return url;
     }
+
+    @Override
+    protected Recommend getRecommend(Element element){
+        String name = element.select("").text();
+        String dataType = element.select("").text();
+        String channel = element.select("").text();
+        long creatTime = Long.parseLong(TimeUtil.currentDateTime());
+        return new Recommend(name,dataType,channel,creatTime);
+    }
+
     @Override
     protected Elements getBookList(Document document) {
         return document.select(".search-result-list clearfix");
@@ -140,14 +152,15 @@ public class Zongheng extends AbstractEgg {
             String html = httpResInfo.getResult();
             Document document = Jsoup.parse(html);
             Elements elements  = document.select("div.content").select("p");
-            StringBuilder StringBuffer = new StringBuilder();
+            StringBuilder stringBuffer = new StringBuilder();
             for (Element element : elements) {
-                StringBuffer.append(element.text());
-                StringBuffer.append("\n");
+                stringBuffer.append(element.text());
+                stringBuffer.append("\n");
             }
-            return StringBuffer.toString();
+            return stringBuffer.toString();
 
         }
         return null;
     }
+    */
 }

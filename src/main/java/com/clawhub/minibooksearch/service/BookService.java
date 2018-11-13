@@ -9,9 +9,11 @@ public interface BookService {
      *
      * @param pageNum  页数
      * @param pageSize 每页数据量
+     * @param dataType 推荐榜类型
+     * @param channel 书籍类型
      * @return 推荐书籍
      */
-    String recommend(int pageNum, int pageSize);
+    String recommend(int pageNum, int pageSize, String dataType, String channel);
 
     /**
      * 查询书籍信息

@@ -9,6 +9,7 @@ import com.clawhub.minibooksearch.core.util.TimeUtil;
 import com.clawhub.minibooksearch.entity.BookInfo;
 import com.clawhub.minibooksearch.entity.BookSource;
 import com.clawhub.minibooksearch.entity.Chapter;
+import com.clawhub.minibooksearch.entity.Recommend;
 import com.clawhub.minibooksearch.spider.core.AbstractEgg;
 import org.apache.http.cookie.Cookie;
 import org.jsoup.Jsoup;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,11 +40,29 @@ public class Qidian extends AbstractEgg {
     protected String getSearchUrl(String keyword) {
         String url = null;
         try {
-            url = "https://www.qidian.com/search?kw=" + URLEncoder.encode(keyword, "UTF-8");
+            if(keyword!=null){
+                if(keyword.contains("recommend")){
+                    String dataType = keyword.split("=")[1];
+                    String channel = keyword.split("=")[2];
+                    url = "https://www.qidian.com/rank/recom?style=1&page=1&dateType=" + dataType + "&chn=" + channel;
+                }else{
+                    url = "https://www.qidian.com/search?kw=" + URLEncoder.encode(keyword, "UTF-8");
+                }
+            }else{
+                url = "https://www.qidian.com/search?kw=" + URLEncoder.encode(keyword, "UTF-8");
+            }
+            logger.info("查询地址为 URL= " + url);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return url;
+    }
+
+    @Override
+    protected Recommend getRecommend(Element element,String dataType, String channel){
+        String name = element.select(".book-mid-info a").first().text();
+        long creatTime = Long.parseLong(TimeUtil.currentDateTime());
+        return new Recommend(name,dataType,channel,creatTime);
     }
 
     @Override
@@ -130,7 +150,7 @@ public class Qidian extends AbstractEgg {
                             //章节链接
                             String url = "https://read.qidian.com/chapter/" + cU;
                             //首发时间 2008-08-02 09:18:37
-                            long dateTime = TimeUtil.StringToMilli(uT, TimeUtil.BASIC_DATE_TIME);
+                            long dateTime = TimeUtil.stringToMilli(uT, TimeUtil.BASIC_DATE_TIME);
                             //序列
                             long sort = Long.parseLong(vId + uuid);
                             //章节字数

@@ -33,6 +33,7 @@ public class RedisConfig {
         container.setConnectionFactory(connectionFactory);
         //订阅了一个叫keyword 的通道
         container.addMessageListener(listenerAdapter, new PatternTopic("keyword"));
+        container.addMessageListener(listenerAdapter, new PatternTopic("recommend"));
         //这个container 可以添加多个 messageListener
         return container;
     }
@@ -50,14 +51,4 @@ public class RedisConfig {
         return new MessageListenerAdapter(receiver, "receiveMessage");
     }
 
-    /**
-     * redis 读取内容的template
-     *
-     * @param connectionFactory the connection factory
-     * @return the string redis template
-     */
-    @Bean
-    StringRedisTemplate template(RedisConnectionFactory connectionFactory) {
-        return new StringRedisTemplate(connectionFactory);
-    }
 }
