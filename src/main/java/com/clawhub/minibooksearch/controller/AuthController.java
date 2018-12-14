@@ -30,8 +30,8 @@ public class AuthController {
      * @param code the code
      * @return the string
      */
-    @GetMapping("code2Session/{code}")
-    public String code2Session(@PathVariable("code") String code) {
+    @GetMapping("getToken/{code}")
+    public String getToken(@PathVariable("code") String code) {
         return authService.code2Session(code);
     }
 

@@ -1,10 +1,6 @@
 package com.clawhub.minibooksearch.core.util;
 
-import org.apache.tomcat.util.security.MD5Encoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.UnsupportedEncodingException;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * <Description> token生成<br>
@@ -15,7 +11,6 @@ import java.io.UnsupportedEncodingException;
  * @create 2018-12-14 20:46<br>
  */
 public class TokenUtil {
-    private static Logger LOGGER = LoggerFactory.getLogger(TokenUtil.class);
 
     /**
      * Gets token.
@@ -25,14 +20,6 @@ public class TokenUtil {
      * @return the token
      */
     public static String getToken(String openId, String sessionKey) {
-        byte[] binaryData;
-        try {
-            binaryData = (openId + sessionKey).getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            //加密失败
-            LOGGER.error("加密失败");
-            return "";
-        }
-        return MD5Encoder.encode(binaryData);
+        return DigestUtils.md5Hex(openId + sessionKey);
     }
 }
