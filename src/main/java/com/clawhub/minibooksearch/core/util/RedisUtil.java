@@ -34,13 +34,14 @@ public class RedisUtil {
 
     /**
      * set String key String field String value
+     *
      * @param key
      * @param field
      * @param value
      * @param timeOut
      * @throws Exception
      */
-    public void set(String key, String field, String value, long timeOut) throws  Exception{
+    public void set(String key, String field, String value, long timeOut) throws Exception {
         try {
             RedisSerializer stringSerializer = new StringRedisSerializer();
             stringRedisTemplate.setKeySerializer(stringSerializer);
@@ -53,13 +54,14 @@ public class RedisUtil {
 
     /**
      * set String key String field Object value
+     *
      * @param key
      * @param field
      * @param value
      * @param timeOut
      * @throws Exception
      */
-    public void set(String key, String field, Object value, long timeOut) throws Exception{
+    public void set(String key, String field, Object value, long timeOut) throws Exception {
         try {
             stringRedisTemplate.opsForHash().put(key, field, value);
             stringRedisTemplate.expire(key, timeOut, TimeUnit.MINUTES);
@@ -70,12 +72,13 @@ public class RedisUtil {
 
     /**
      * set String key String value
+     *
      * @param key
      * @param value
      * @param timeOut
      * @throws Exception
      */
-    public void set(String key, String value, long timeOut) throws Exception{
+    public void set(String key, String value, long timeOut) throws Exception {
         try {
             RedisSerializer stringSerializer = new StringRedisSerializer();
             stringRedisTemplate.setKeySerializer(stringSerializer);
@@ -88,11 +91,12 @@ public class RedisUtil {
 
     /**
      * get String key
+     *
      * @param key
      * @return String
      * @throws Exception
      */
-    public String getString(String key) throws Exception{
+    public String getString(String key) throws Exception {
         try {
             return stringRedisTemplate.opsForValue().get(key);
         } catch (Exception e) {
@@ -102,12 +106,13 @@ public class RedisUtil {
 
     /**
      * get String key String field
+     *
      * @param key
      * @param field
      * @return String
      * @throws Exception
      */
-    public String getString(String key, String field) throws Exception{
+    public String getString(String key, String field) throws Exception {
         try {
             return stringRedisTemplate.opsForHash().get(key, field).toString();
         } catch (Exception e) {
@@ -117,12 +122,13 @@ public class RedisUtil {
 
     /**
      * get String key String field
+     *
      * @param key
      * @param field
      * @return Object
      * @throws Exception
      */
-    public Object getObject(String key, String field) throws Exception{
+    public Object getObject(String key, String field) throws Exception {
         try {
             return stringRedisTemplate.opsForHash().get(key, field);
         } catch (Exception e) {
@@ -132,9 +138,10 @@ public class RedisUtil {
 
     /**
      * remove String key
+     *
      * @param key
      */
-    public void remove(String key){
+    public void remove(String key) {
         stringRedisTemplate.expire(key, 1, TimeUnit.NANOSECONDS);
     }
 

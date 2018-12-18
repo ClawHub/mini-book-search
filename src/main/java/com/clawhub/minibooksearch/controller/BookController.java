@@ -1,10 +1,11 @@
 package com.clawhub.minibooksearch.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.clawhub.minibooksearch.core.constants.BookTypeConstant;
 import com.clawhub.minibooksearch.core.util.CommonUtil;
 import com.clawhub.minibooksearch.service.BookService;
 import com.clawhub.minibooksearch.service.SpiderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("book")
 public class BookController {
+
+    /**
+     * The Logger.
+     */
+    private Logger logger = LoggerFactory.getLogger(BookController.class);
+
     /**
      * The Book service.
      */
@@ -52,6 +59,7 @@ public class BookController {
         Map<String,String> map = CommonUtil.checkRecommend(dataType,channel);
         //爬虫异步操作
         spiderService.searchRecommendCollection(map.get("dataType"), map.get("channel"));
+
         //查询数据库
         return bookService.recommend(pageNum, pageSize,map.get("dataType"), map.get("channel"));
     }
@@ -71,6 +79,7 @@ public class BookController {
         //异步书籍搜集
         spiderService.searchKeywordsCollection(keyWord);
         //本地书籍信息查询
+        logger.info("测试异步线程");
         return bookService.searchBookInfo(pageNum, pageSize, keyWord);
     }
 

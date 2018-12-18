@@ -1,6 +1,7 @@
 package com.clawhub.minibooksearch.spider.queue;
 
 import com.clawhub.minibooksearch.core.spring.SpringContextHelper;
+import com.clawhub.minibooksearch.core.util.AsyncToSyncUtil;
 import com.clawhub.minibooksearch.spider.core.Egg;
 import com.clawhub.minibooksearch.spider.core.EggResult;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import java.util.Map;
  * @CreateDate 2018/10/15 10:36 <br>
  */
 @Component
-public class MessageReceiver {
+public class MessageReceiver extends AsyncToSyncUtil {
     /**
      * The Logger.
      */
@@ -31,10 +32,17 @@ public class MessageReceiver {
      */
     public void receiveMessage(String message) throws Exception {
         logger.info("收到一条消息：{}", message);
+        final String message1 = message;
         //获取所有爬虫
-        Map<String, Egg> eggMap = SpringContextHelper.getApplicationContext().getBeansOfType(Egg.class);
-        for (Egg eggEntry : eggMap.values()) {
-            eggEntry.touch(message);
-        }
+        new Thread(() -> {
+            Map<String, Egg> eggMap = SpringContextHelper.getApplicationContext().getBeansOfType(Egg.class);
+            for (Egg eggEntry : eggMap.values()) {
+                eggEntry.touch(message1);
+            }
+            AsyncToSyncUtil.callback();
+            logger.info("异步爬虫结束");
+
+        }).start();
+
     }
 }

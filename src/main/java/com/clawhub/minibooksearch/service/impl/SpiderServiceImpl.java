@@ -22,6 +22,7 @@ import java.util.Map;
  */
 @Service
 public class SpiderServiceImpl implements SpiderService {
+
     /**
      * The Message sender.
      */
