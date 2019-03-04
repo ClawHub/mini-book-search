@@ -39,7 +39,7 @@ public class MessageReceiver extends AsyncToSyncUtil {
             for (Egg eggEntry : eggMap.values()) {
                 eggEntry.touch(message1);
             }
-            AsyncToSyncUtil.callback();
+//            AsyncToSyncUtil.callback();
             logger.info("异步爬虫结束");
 
         }).start();

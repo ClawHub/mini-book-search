@@ -322,6 +322,26 @@ public class HttpGenerator {
         return getFinalResponse(httpGet, url, isUsePool);
     }
 
+    /**
+     * Send get http res info.
+     *
+     * @param url the url
+     * @return the http res info
+     */
+    public static HttpResInfo sendGet(String url) {
+        return sendGet(url, 2000, 2000, null, false);
+    }
+
+    /**
+     * Send get http res info.
+     *
+     * @param url     the url
+     * @param headMap the head map
+     * @return the http res info
+     */
+    public static HttpResInfo sendGet(String url, Map<String, String> headMap) {
+        return sendGet(url, 2000, 2000, headMap, false);
+    }
 
     /**
      * Send form http res info.

@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  * @taskId <br>
  * @create 2018-12-18 21:20<br>
  */
-@Component
+//@Component
 public class AuthInterceptor implements HandlerInterceptor {
     /**
      * The String redis template.

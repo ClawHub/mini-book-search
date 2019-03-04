@@ -30,7 +30,7 @@ public class MessageSender {
      */
     public void sendMessage(String keyword) {
         stringRedisTemplate.convertAndSend("keyword", keyword);
-        AsyncToSyncUtil.transfer();
+//        AsyncToSyncUtil.transfer();
     }
 
     /**

@@ -1,16 +1,16 @@
 package com.clawhub.minibooksearch.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.clawhub.minibooksearch.associative.AssociativeSearch;
+import com.clawhub.minibooksearch.core.result.ResultUtil;
 import com.clawhub.minibooksearch.core.util.CommonUtil;
 import com.clawhub.minibooksearch.service.BookService;
 import com.clawhub.minibooksearch.service.SpiderService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -44,6 +44,12 @@ public class BookController {
     private SpiderService spiderService;
 
     /**
+     * 搜索联想服务
+     */
+    @Autowired
+    private AssociativeSearch associativeSearch;
+
+    /**
      * 推荐书籍
      *
      * @param param the param
@@ -56,12 +62,12 @@ public class BookController {
         int pageSize = body.getIntValue("pageSize");
         String dataType = body.getString("dataType");
         String channel = body.getString("channel");
-        Map<String,String> map = CommonUtil.checkRecommend(dataType,channel);
+        Map<String, String> map = CommonUtil.checkRecommend(dataType, channel);
         //爬虫异步操作
         spiderService.searchRecommendCollection(map.get("dataType"), map.get("channel"));
 
         //查询数据库
-        return bookService.recommend(pageNum, pageSize,map.get("dataType"), map.get("channel"));
+        return bookService.recommend(pageNum, pageSize, map.get("dataType"), map.get("channel"));
     }
 
     /**
@@ -125,4 +131,17 @@ public class BookController {
         return spiderService.readChapter(webSite, chapterUrl);
     }
 
+    /**
+     * 搜索联想功能
+     *
+     * @param key the key
+     * @return the string
+     */
+    @GetMapping("/associativeSearch/{key}")
+    public String associativeSearch(@PathVariable String key) {
+        if (StringUtils.isBlank(key)) {
+            return ResultUtil.getSucc();
+        }
+        return ResultUtil.getSucc(associativeSearch.searchBookName(key));
+    }
 }

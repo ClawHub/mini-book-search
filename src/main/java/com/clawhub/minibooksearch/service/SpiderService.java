@@ -42,4 +42,5 @@ public interface SpiderService {
      * @return 文章内容
      */
     String readChapter(String webSite, String chapterUrl);
+
 }
