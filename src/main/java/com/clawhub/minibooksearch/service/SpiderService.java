@@ -1,5 +1,9 @@
 package com.clawhub.minibooksearch.service;
 
+import com.clawhub.minibooksearch.entity.BookInfo;
+
+import java.util.List;
+
 /**
  * <Description> 爬虫对外接口<br>
  *
@@ -19,10 +23,11 @@ public interface SpiderService {
 
     /**
      * 查找推荐榜根据榜类型和书籍类型
+     *
      * @param dataType
      * @param channel
      */
-    void searchRecommendCollection(String dataType,String channel);
+    void searchRecommendCollection(String dataType, String channel);
 
     /**
      * 实时获取章节信息
@@ -43,4 +48,18 @@ public interface SpiderService {
      */
     String readChapter(String webSite, String chapterUrl);
 
+    /**
+     * 异步书籍爬取
+     *
+     * @param name 书籍名称
+     */
+    void asyncSearchKeywords(String name);
+
+    /**
+     * 同步书籍爬取
+     *
+     * @param name 书籍名称
+     * @return 书籍列表
+     */
+    List<BookInfo> syncSearchKeyword(String name);
 }

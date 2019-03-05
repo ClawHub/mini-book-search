@@ -78,25 +78,6 @@ public class BookController {
 
 
     /**
-     * Search book info string.
-     *
-     * @param param the param
-     * @return the string
-     */
-    @PostMapping("searchBookInfo")
-    public String searchBookInfo(@RequestBody String param) {
-        JSONObject body = JSONObject.parseObject(param);
-        int pageNum = body.getIntValue("pageNum");
-        int pageSize = body.getIntValue("pageSize");
-        String keyWord = body.getString("name");
-        //异步书籍搜集
-        spiderService.searchKeywordsCollection(keyWord);
-        //本地书籍信息查询
-        logger.info("测试异步线程");
-        return bookService.searchBookInfo(pageNum, pageSize, keyWord);
-    }
-
-    /**
      * Search book source string.
      *
      * @param param the param
@@ -160,5 +141,20 @@ public class BookController {
     @GetMapping("recommend")
     public String recommend() {
         return ResultUtil.getSucc(recommendSearch.recommendBook());
+    }
+
+    /**
+     * 搜索书籍信息
+     *
+     * @param param the param
+     * @return the string
+     */
+    @PostMapping("searchBookInfo")
+    public String searchBookInfo(@RequestBody String param) {
+        JSONObject body = JSONObject.parseObject(param);
+        int pageNum = body.getIntValue("pageNum");
+        int pageSize = body.getIntValue("pageSize");
+        String keyWord = body.getString("name");
+        return bookService.searchBookInfo(pageNum, pageSize, keyWord);
     }
 }

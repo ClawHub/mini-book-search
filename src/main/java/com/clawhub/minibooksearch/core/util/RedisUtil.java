@@ -1,8 +1,6 @@
 package com.clawhub.minibooksearch.core.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -84,6 +82,22 @@ public class RedisUtil {
             stringRedisTemplate.setKeySerializer(stringSerializer);
             stringRedisTemplate.opsForValue().append(key, value);
             stringRedisTemplate.expire(key, timeOut, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            throw new Exception(SETREDISERROR, e);
+        }
+    }
+
+    /**
+     * Set.
+     *
+     * @param key the key
+     * @throws Exception the exception
+     */
+    public void set(String key) throws Exception {
+        try {
+            RedisSerializer stringSerializer = new StringRedisSerializer();
+            stringRedisTemplate.setKeySerializer(stringSerializer);
+            stringRedisTemplate.opsForValue().append(key, "1");
         } catch (Exception e) {
             throw new Exception(SETREDISERROR, e);
         }

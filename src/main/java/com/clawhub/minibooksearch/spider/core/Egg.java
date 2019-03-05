@@ -20,7 +20,7 @@ public interface Egg {
      *
      * @param keyword 关键词
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     EggResult touch(String keyword);
 
     /**

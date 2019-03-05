@@ -1,10 +1,7 @@
 package com.clawhub.minibooksearch.spider.queue;
 
-import com.clawhub.minibooksearch.core.util.AsyncToSyncUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,19 +23,19 @@ public class MessageSender {
     /**
      * Send message.
      *
-     * @param keyword the keyword
+     * @param book book
      */
-    public void sendMessage(String keyword) {
-        stringRedisTemplate.convertAndSend("keyword", keyword);
+    public void sendBookMessage(String book) {
+        stringRedisTemplate.convertAndSend("book", book);
 //        AsyncToSyncUtil.transfer();
     }
 
     /**
      * 创建一个名为recommend的通道
      *
-     * @param keyword
+     * @param recommend recommend
      */
-    public void sendRecommendMessage(String keyword) {
-        stringRedisTemplate.convertAndSend("recommend", keyword);
+    public void sendRecommendMessage(String recommend) {
+        stringRedisTemplate.convertAndSend("recommend", recommend);
     }
 }
