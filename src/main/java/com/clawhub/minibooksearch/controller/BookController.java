@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.clawhub.minibooksearch.associative.AssociativeSearch;
 import com.clawhub.minibooksearch.core.result.ResultUtil;
 import com.clawhub.minibooksearch.core.util.CommonUtil;
+import com.clawhub.minibooksearch.recommend.RecommendSearch;
 import com.clawhub.minibooksearch.service.BookService;
 import com.clawhub.minibooksearch.service.SpiderService;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +45,11 @@ public class BookController {
     private SpiderService spiderService;
 
     /**
+     * The Recommend search.
+     */
+    @Autowired
+    private RecommendSearch recommendSearch;
+    /**
      * 搜索联想服务
      */
     @Autowired
@@ -69,6 +75,7 @@ public class BookController {
         //查询数据库
         return bookService.recommend(pageNum, pageSize, map.get("dataType"), map.get("channel"));
     }
+
 
     /**
      * Search book info string.
@@ -143,5 +150,15 @@ public class BookController {
             return ResultUtil.getSucc();
         }
         return ResultUtil.getSucc(associativeSearch.searchBookName(key));
+    }
+
+    /**
+     * 推荐
+     *
+     * @return the string
+     */
+    @GetMapping("recommend")
+    public String recommend() {
+        return ResultUtil.getSucc(recommendSearch.recommendBook());
     }
 }
