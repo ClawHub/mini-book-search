@@ -5,6 +5,7 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -20,13 +21,18 @@ import javax.servlet.http.HttpServletResponse;
  * @taskId <br>
  * @create 2018-12-18 21:20<br>
  */
-//@Component
+@Component
 public class AuthInterceptor implements HandlerInterceptor {
     /**
      * The String redis template.
      */
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    /**
+     * The Auth prefix.
+     */
+    @Value("${redis.key.prefix.auth}")
+    private String authPrefix;
     /**
      * The Logger.
      */
@@ -40,7 +46,8 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
         logger.info("token:{}", token);
-        String authInfo = stringRedisTemplate.opsForValue().get(token);
+        String authInfo = stringRedisTemplate.opsForValue().get(authPrefix + token);
+        logger.info("authInfo:{}", authInfo);
         if (StringUtils.isBlank(authInfo)) {
             httpServletResponse.sendError(HttpStatus.SC_FORBIDDEN);
             return false;

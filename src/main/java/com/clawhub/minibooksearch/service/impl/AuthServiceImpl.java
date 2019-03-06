@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * <Description> 登陆服务接口<br>
  *
@@ -51,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * 登录凭证校验。通过 wx.login() 接口获得临时登录凭证 code 后传到开发者服务器调用此接口完成登录流程
+     * 用户登录凭证（有效期五分钟）
      *
      * @param code 临时登录凭证 code
      * @return token
@@ -63,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
             JSONObject body = JSONObject.parseObject(httpResInfo.getResult());
             //用户唯一标识
             String openId = body.getString("openid");
-            logger.error("openId：{}", openId);
+            logger.info("openId：{}", openId);
             if (StringUtils.isBlank(openId)) {
                 logger.error("微信小程序返回错误码：{},错误信息为：{}", body.getInteger("errcode"), body.getString("errmsg"));
                 return ResultUtil.getError("2001");
@@ -73,8 +76,8 @@ public class AuthServiceImpl implements AuthService {
             logger.error("sessionKey：{}", sessionKey);
             //创建token
             String token = TokenUtil.getToken(openId, sessionKey);
-            //token入redis
-            stringRedisTemplate.opsForValue().set(authPrefix + token, openId + ":" + sessionKey);
+            //token入redis，7分钟删除
+            stringRedisTemplate.opsForValue().set(authPrefix + token, openId + ":" + sessionKey, 60 * 7, TimeUnit.SECONDS);
             logger.error("获取token成功：{}", token);
             //返回token
             return ResultUtil.getSucc(token);

@@ -20,10 +20,7 @@
             <result column="remark" jdbcType="VARCHAR" property="remark"/>
             <result column="pic_url" jdbcType="VARCHAR" property="picUrl"/>
         </association>
-    </resultMap>
-
-    <!--预览书架-->
-    <select id="viewBookShelf" resultMap="BaseResultMap">
+    </resultMap><select id="viewBookShelf" resultMap="BaseResultMap">
         select *
         from t_book_info t1,t_book_shelf t2
         where t2.open_id = #{openId}
