@@ -1,22 +1,14 @@
 package com.clawhub.minibooksearch.entity;
 
 import javax.persistence.Column;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Table(name = "t_chapter")
 public class Chapter {
     /**
-     * 章节id
+     * 章节id，唯一
      */
-    @Id
     private String id;
-
-    /**
-     * 书籍源id
-     */
-    @Column(name = "source_id")
-    private String sourceId;
 
     /**
      * 章节名称
@@ -35,7 +27,7 @@ public class Chapter {
     private Long dateTime;
 
     /**
-     * 序列
+     * 序列，用于排序
      */
     private Long sort;
 
@@ -45,39 +37,27 @@ public class Chapter {
     private Integer number;
 
     /**
-     * 获取章节id
+     * 章节序号，如第一章，用于展示
+     */
+    @Column(name = "serial_num")
+    private String serialNum;
+
+    /**
+     * 获取章节id，唯一
      *
-     * @return id - 章节id
+     * @return id - 章节id，唯一
      */
     public String getId() {
         return id;
     }
 
     /**
-     * 设置章节id
+     * 设置章节id，唯一
      *
-     * @param id 章节id
+     * @param id 章节id，唯一
      */
     public void setId(String id) {
         this.id = id;
-    }
-
-    /**
-     * 获取书籍源id
-     *
-     * @return source_id - 书籍源id
-     */
-    public String getSourceId() {
-        return sourceId;
-    }
-
-    /**
-     * 设置书籍源id
-     *
-     * @param sourceId 书籍源id
-     */
-    public void setSourceId(String sourceId) {
-        this.sourceId = sourceId;
     }
 
     /**
@@ -135,18 +115,18 @@ public class Chapter {
     }
 
     /**
-     * 获取序列
+     * 获取序列，用于排序
      *
-     * @return sort - 序列
+     * @return sort - 序列，用于排序
      */
     public Long getSort() {
         return sort;
     }
 
     /**
-     * 设置序列
+     * 设置序列，用于排序
      *
-     * @param sort 序列
+     * @param sort 序列，用于排序
      */
     public void setSort(Long sort) {
         this.sort = sort;
@@ -168,5 +148,23 @@ public class Chapter {
      */
     public void setNumber(Integer number) {
         this.number = number;
+    }
+
+    /**
+     * 获取章节序号，如第一章，用于展示
+     *
+     * @return serial_num - 章节序号，如第一章，用于展示
+     */
+    public String getSerialNum() {
+        return serialNum;
+    }
+
+    /**
+     * 设置章节序号，如第一章，用于展示
+     *
+     * @param serialNum 章节序号，如第一章，用于展示
+     */
+    public void setSerialNum(String serialNum) {
+        this.serialNum = serialNum;
     }
 }

@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.clawhub.minibooksearch.mapper.ChapterMapper" >
-  <resultMap id="BaseResultMap" type="com.clawhub.minibooksearch.entity.Chapter" >
+<mapper namespace="com.clawhub.minibooksearch.mapper.VolumeMapper" >
+  <resultMap id="BaseResultMap" type="com.clawhub.minibooksearch.entity.Volume" >
     <!--
       WARNING - @mbg.generated
     -->
     <result column="id" property="id" jdbcType="VARCHAR" />
     <result column="name" property="name" jdbcType="VARCHAR" />
-    <result column="url" property="url" jdbcType="VARCHAR" />
-    <result column="date_time" property="dateTime" jdbcType="BIGINT" />
-    <result column="sort" property="sort" jdbcType="BIGINT" />
-    <result column="number" property="number" jdbcType="INTEGER" />
+    <result column="chapter_count" property="chapterCount" jdbcType="INTEGER" />
+    <result column="word_count" property="wordCount" jdbcType="INTEGER" />
     <result column="serial_num" property="serialNum" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="BIGINT" />
   </resultMap>
 </mapper>
