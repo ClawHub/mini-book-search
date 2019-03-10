@@ -3,7 +3,7 @@ package com.clawhub.minibooksearch.service.impl;
 import com.clawhub.minibooksearch.core.result.ResultUtil;
 import com.clawhub.minibooksearch.core.spring.SpringContextHelper;
 import com.clawhub.minibooksearch.entity.BookInfo;
-import com.clawhub.minibooksearch.entity.Chapter;
+import com.clawhub.minibooksearch.entity.CatalogResult;
 import com.clawhub.minibooksearch.service.SpiderService;
 import com.clawhub.minibooksearch.spider.core.Egg;
 import com.clawhub.minibooksearch.spider.core.EggResult;
@@ -51,18 +51,6 @@ public class SpiderServiceImpl implements SpiderService {
     }
 
     @Override
-    public String searchChapter(String webSite, String catalogUrl, String sourceId) {
-        Egg egg = (Egg) SpringContextHelper.getBean(webSite);
-        Map<String, Chapter> chapters = null;
-        try {
-            chapters = egg.chapter(catalogUrl, sourceId);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ResultUtil.getSucc(chapters);
-    }
-
-    @Override
     public String readChapter(String webSite, String chapterUrl) {
         Egg egg = (Egg) SpringContextHelper.getBean(webSite);
         String content = null;
@@ -104,6 +92,20 @@ public class SpiderServiceImpl implements SpiderService {
 
         }
         return bookInfoList;
+    }
+
+    /**
+     * 同步爬取目录
+     *
+     * @param webSite    站点
+     * @param catalogUrl 目录URL
+     * @param sourceId   书籍源ID
+     * @return 结果
+     */
+    @Override
+    public CatalogResult crawlCatalog(String webSite, String catalogUrl, String sourceId) {
+        Egg egg = (Egg) SpringContextHelper.getBean(webSite);
+        return egg.crawlCatalog(catalogUrl, sourceId);
     }
 
 }

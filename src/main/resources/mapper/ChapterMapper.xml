@@ -1,16 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.clawhub.minibooksearch.mapper.ChapterMapper" >
-  <resultMap id="BaseResultMap" type="com.clawhub.minibooksearch.entity.Chapter" >
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <result column="id" property="id" jdbcType="VARCHAR" />
-    <result column="name" property="name" jdbcType="VARCHAR" />
-    <result column="url" property="url" jdbcType="VARCHAR" />
-    <result column="date_time" property="dateTime" jdbcType="BIGINT" />
-    <result column="sort" property="sort" jdbcType="BIGINT" />
-    <result column="number" property="number" jdbcType="INTEGER" />
-    <result column="serial_num" property="serialNum" jdbcType="VARCHAR" />
-  </resultMap>
+<mapper namespace="com.clawhub.minibooksearch.mapper.ChapterMapper">
+    <resultMap id="BaseResultMap" type="com.clawhub.minibooksearch.entity.Chapter">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="date_time" property="dateTime" jdbcType="BIGINT"/>
+        <result column="sort" property="sort" jdbcType="BIGINT"/>
+        <result column="number" property="number" jdbcType="INTEGER"/>
+        <result column="serial_num" property="serialNum" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--批量插入章节-->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO t_chapter
+        (id, name, url,date_time,sort,number,serial_num)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.name},#{item.url},#{item.dateTime},#{item.sort},#{item.number},#{item.serialNum})
+        </foreach>
+    </insert>
+    <!--根据卷ID获取章节列表-->
+    <select id="searchChaptersByVolumeId" resultMap="BaseResultMap">
+        SELECT
+            t1.id,t1.name,t1.url,t1.date_time,t1.sort,t1.number,t1.serial_num
+        FROM
+            t_chapter t1,
+            t_volume_chapter t2
+        WHERE
+            t1.id = t2.chapter_id
+            AND t2.volume_id = #{volumeId}
+        ORDER BY
+            t1.sort
+    </select>
 </mapper>

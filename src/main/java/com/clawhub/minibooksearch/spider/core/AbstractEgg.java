@@ -5,10 +5,8 @@ import com.clawhub.minibooksearch.core.http.HttpResInfo;
 import com.clawhub.minibooksearch.core.util.RedisUtil;
 import com.clawhub.minibooksearch.entity.BookInfo;
 import com.clawhub.minibooksearch.entity.BookSource;
-import com.clawhub.minibooksearch.mapper.BookInfoMapper;
-import com.clawhub.minibooksearch.mapper.BookSourceMapper;
-import com.clawhub.minibooksearch.mapper.ChapterMapper;
-import com.clawhub.minibooksearch.mapper.RecommendMapper;
+import com.clawhub.minibooksearch.entity.CatalogResult;
+import com.clawhub.minibooksearch.mapper.*;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -55,6 +53,23 @@ public abstract class AbstractEgg implements Egg {
     protected RecommendMapper recommendMapper;
 
     /**
+     * The Volume mapper.
+     */
+    @Autowired
+    protected VolumeMapper volumeMapper;
+
+    /**
+     * The Book source volume mapper.
+     */
+    @Autowired
+    protected BookSourceVolumeMapper bookSourceVolumeMapper;
+
+    /**
+     * The Volume chapter mapper.
+     */
+    @Autowired
+    protected VolumeChapterMapper volumeChapterMapper;
+    /**
      * The Chapter mapper.
      */
     @Autowired
@@ -81,7 +96,6 @@ public abstract class AbstractEgg implements Egg {
     @Value("${parse.search.keyword.max.num}")
     protected int maxNum;
 
-
     /**
      * Touch egg result.
      *
@@ -97,6 +111,32 @@ public abstract class AbstractEgg implements Egg {
         }
         return new EggResult();
     }
+
+    /**
+     * 同步爬取目录
+     *
+     * @param catalogUrl 目录url
+     * @param sourceId   书籍源ID
+     * @return 结果
+     */
+    @Override
+    public CatalogResult crawlCatalog(String catalogUrl, String sourceId) {
+        CatalogResult catalogResult = parseCatalog(catalogUrl, sourceId);
+        bookSourceVolumeMapper.batchInsert(catalogResult.getBookSourceVolumeList());
+        volumeMapper.batchInsert(catalogResult.getVolumeList());
+        volumeChapterMapper.batchInsert(catalogResult.getVolumeChapterList());
+        chapterMapper.batchInsert(catalogResult.getChapterList());
+        return catalogResult;
+    }
+
+    /**
+     * 目录抓取
+     *
+     * @param catalogUrl 目录URL
+     * @param sourceId   书籍源ID
+     * @return 结果
+     */
+    protected abstract CatalogResult parseCatalog(String catalogUrl, String sourceId);
 
     /**
      * 查询关键词

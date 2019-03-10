@@ -4,15 +4,20 @@ import com.alibaba.fastjson.JSONObject;
 import com.clawhub.minibooksearch.associative.AssociativeSearch;
 import com.clawhub.minibooksearch.core.result.ResultUtil;
 import com.clawhub.minibooksearch.core.util.CommonUtil;
+import com.clawhub.minibooksearch.entity.Chapter;
+import com.clawhub.minibooksearch.entity.Volume;
 import com.clawhub.minibooksearch.recommend.RecommendSearch;
 import com.clawhub.minibooksearch.service.BookService;
+import com.clawhub.minibooksearch.service.ChapterService;
 import com.clawhub.minibooksearch.service.SpiderService;
+import com.clawhub.minibooksearch.service.VolumeService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,6 +60,20 @@ public class BookController {
     @Autowired
     private AssociativeSearch associativeSearch;
 
+
+    /**
+     * The Volume service.
+     */
+    @Autowired
+    private VolumeService volumeService;
+
+
+    /**
+     * The Chapter service.
+     */
+    @Autowired
+    private ChapterService chapterService;
+
     /**
      * 推荐书籍
      *
@@ -90,20 +109,37 @@ public class BookController {
         return bookService.searchBookSource(bookId);
     }
 
+
     /**
-     * Search chapter string.
+     * 查询卷
      *
      * @param param the param
      * @return the string
      */
-    @PostMapping("searchChapter")
-    public String searchChapter(@RequestBody String param) {
+    @PostMapping("searchVolumes")
+    public String searchVolumes(@RequestBody String param) {
         JSONObject body = JSONObject.parseObject(param);
         String sourceId = body.getString("sourceId");
         String catalogUrl = body.getString("catalogUrl");
         String webSite = body.getString("webSite");
-        return spiderService.searchChapter(webSite, catalogUrl, sourceId);
+        List<Volume> volumeList = volumeService.searchVolumes(sourceId, catalogUrl, webSite);
+        return ResultUtil.getSucc(volumeList);
     }
+
+    /**
+     * 根据卷ID获取章节列表
+     *
+     * @param param the param
+     * @return the string
+     */
+    @PostMapping("searchChaptersByVolumeId")
+    public String searchChaptersByVolumeId(@RequestBody String param) {
+        JSONObject body = JSONObject.parseObject(param);
+        String volumeId = body.getString("volumeId");
+        List<Chapter> chapterList = chapterService.searchChaptersByVolumeId(volumeId);
+        return ResultUtil.getSucc(chapterList);
+    }
+
 
     /**
      * Read chapter string.

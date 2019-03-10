@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.clawhub.minibooksearch.mapper.VolumeMapper" >
-  <resultMap id="BaseResultMap" type="com.clawhub.minibooksearch.entity.Volume" >
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <result column="id" property="id" jdbcType="VARCHAR" />
-    <result column="name" property="name" jdbcType="VARCHAR" />
-    <result column="chapter_count" property="chapterCount" jdbcType="INTEGER" />
-    <result column="word_count" property="wordCount" jdbcType="INTEGER" />
-    <result column="serial_num" property="serialNum" jdbcType="VARCHAR" />
-    <result column="sort" property="sort" jdbcType="BIGINT" />
-  </resultMap>
+<mapper namespace="com.clawhub.minibooksearch.mapper.VolumeMapper">
+    <resultMap id="BaseResultMap" type="com.clawhub.minibooksearch.entity.Volume">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="chapter_count" property="chapterCount" jdbcType="INTEGER"/>
+        <result column="word_count" property="wordCount" jdbcType="INTEGER"/>
+        <result column="serial_num" property="serialNum" jdbcType="VARCHAR"/>
+        <result column="sort" property="sort" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <!--批量插入卷列表-->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO t_volume
+        (id, name, chapter_count,word_count,serial_num,sort)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.name},#{item.chapterCount},#{item.wordCount},#{item.serialNum},#{item.sort})
+        </foreach>
+    </insert>
+
+    <!--根据书籍源ID获取卷列表-->
+    <select id="searchVolumesBySourceId" resultMap="BaseResultMap">
+        SELECT
+            t1.id,t1.name,t1.chapter_count,t1.word_count,t1.serial_num,t1.sort
+        FROM
+            t_volume t1,
+            t_book_source_volume t2
+        WHERE
+            t1.id = t2.volume_id
+            AND t2.book_source_id = #{sourceId}
+        ORDER BY
+            t1.sort
+    </select>
 </mapper>

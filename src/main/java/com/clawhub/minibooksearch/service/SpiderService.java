@@ -1,6 +1,7 @@
 package com.clawhub.minibooksearch.service;
 
 import com.clawhub.minibooksearch.entity.BookInfo;
+import com.clawhub.minibooksearch.entity.CatalogResult;
 
 import java.util.List;
 
@@ -30,16 +31,6 @@ public interface SpiderService {
     void searchRecommendCollection(String dataType, String channel);
 
     /**
-     * 实时获取章节信息
-     *
-     * @param webSite    站点
-     * @param catalogUrl 目录地址
-     * @param sourceId   书籍源ID
-     * @return 章节信息
-     */
-    String searchChapter(String webSite, String catalogUrl, String sourceId);
-
-    /**
      * 阅读章节
      *
      * @param webSite    站点
@@ -62,4 +53,14 @@ public interface SpiderService {
      * @return 书籍列表
      */
     List<BookInfo> syncSearchKeyword(String name);
+
+    /**
+     * 同步爬取
+     *
+     * @param webSite    站点
+     * @param catalogUrl 目录URL
+     * @param sourceId   书籍源ID
+     * @return 结果
+     */
+    CatalogResult crawlCatalog(String webSite, String catalogUrl, String sourceId);
 }

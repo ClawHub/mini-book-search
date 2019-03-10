@@ -278,7 +278,7 @@ public class HttpGenerator {
         try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
             // 正常连接到目标并获取到返回
             String body = getBody(response);
-            LOGGER.info(" url is : {}, source result from upStream is : {}", url, body);
+//            LOGGER.info(" url is : {}, source result from upStream is : {}", url, body);
             int status = response.getStatusLine().getStatusCode();
             // 返回非200，打印日志
             if (HttpStatus.SC_OK != status) {
