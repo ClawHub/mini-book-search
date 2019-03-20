@@ -140,7 +140,6 @@ public class BookController {
         return ResultUtil.getSucc(chapterList);
     }
 
-
     /**
      * Read chapter string.
      *

@@ -76,8 +76,8 @@ public class AuthServiceImpl implements AuthService {
             logger.error("sessionKey：{}", sessionKey);
             //创建token
             String token = TokenUtil.getToken(openId, sessionKey);
-            //token入redis，7分钟删除
-            stringRedisTemplate.opsForValue().set(authPrefix + token, openId + ":" + sessionKey, 60 * 7, TimeUnit.SECONDS);
+            //token入redis，5分钟删除
+            stringRedisTemplate.opsForValue().set(authPrefix + token, openId + ":" + sessionKey, 60 * 5, TimeUnit.SECONDS);
             logger.error("获取token成功：{}", token);
             //返回token
             return ResultUtil.getSucc(token);
