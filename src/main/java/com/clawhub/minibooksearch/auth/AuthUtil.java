@@ -33,6 +33,16 @@ public class AuthUtil {
     }
 
     /**
+     * Gets token.
+     *
+     * @return the token
+     */
+    public static String getToken() {
+        return getRequest().getAttribute("token").toString();
+    }
+
+
+    /**
      * Gets session key.
      *
      * @return the session key

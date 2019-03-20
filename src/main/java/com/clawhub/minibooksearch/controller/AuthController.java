@@ -1,5 +1,6 @@
 package com.clawhub.minibooksearch.controller;
 
+import com.clawhub.minibooksearch.auth.AuthUtil;
 import com.clawhub.minibooksearch.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,7 @@ public class AuthController {
      */
     @GetMapping("getToken/{code}")
     public String getToken(@PathVariable("code") String code) {
-        return authService.code2Session(code);
+        return authService.code2Session(code, AuthUtil.getToken());
     }
 
 }

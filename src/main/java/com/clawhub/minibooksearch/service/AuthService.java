@@ -12,8 +12,9 @@ public interface AuthService {
     /**
      * 登录凭证校验。通过 wx.login() 接口获得临时登录凭证 code 后传到开发者服务器调用此接口完成登录流程
      *
-     * @param code 临时登录凭证 code
+     * @param code     临时登录凭证 code
+     * @param oldToken oldToken
      * @return token
      */
-    String code2Session(String code);
+    String code2Session(String code, String oldToken);
 }

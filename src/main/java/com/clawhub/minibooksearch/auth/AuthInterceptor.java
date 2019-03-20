@@ -57,6 +57,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         String sessionKey = strings[1];
         httpServletRequest.setAttribute("openId", openId);
         httpServletRequest.setAttribute("sessionKey", sessionKey);
+        httpServletRequest.setAttribute("token", token);
         return true;
     }
 

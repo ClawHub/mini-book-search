@@ -55,11 +55,12 @@ public class AuthServiceImpl implements AuthService {
      * 登录凭证校验。通过 wx.login() 接口获得临时登录凭证 code 后传到开发者服务器调用此接口完成登录流程
      * 用户登录凭证（有效期五分钟）
      *
-     * @param code 临时登录凭证 code
-     * @return token
+     * @param code     临时登录凭证 code
+     * @param oldToken the old token
+     * @return token string
      */
     @Override
-    public String code2Session(String code) {
+    public String code2Session(String code, String oldToken) {
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid=" + appId + "&secret=" + secret + "&js_code=" + code + "&grant_type=authorization_code";
         HttpResInfo httpResInfo = HttpGenerator.sendGet(url, 6000, 6000, null, false);
         if (httpResInfo.isSuccess()) {
@@ -76,8 +77,10 @@ public class AuthServiceImpl implements AuthService {
             logger.error("sessionKey：{}", sessionKey);
             //创建token
             String token = TokenUtil.getToken(openId, sessionKey);
-            //token入redis，5分钟删除
-            stringRedisTemplate.opsForValue().set(authPrefix + token, openId + ":" + sessionKey, 60 * 5, TimeUnit.SECONDS);
+            //token入redis,永久，等下次获取token的时候删除
+            stringRedisTemplate.opsForValue().set(authPrefix + token, openId + ":" + sessionKey);
+            //删除老的token
+            stringRedisTemplate.delete(authPrefix + oldToken);
             logger.error("获取token成功：{}", token);
             //返回token
             return ResultUtil.getSucc(token);
